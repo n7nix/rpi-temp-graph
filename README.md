@@ -1,7 +1,7 @@
 # rpi-temp-graph
 Plot Raspberry Pi temperature on a graph using [RRD](https://oss.oetiker.ch/rrdtool/) logging & graphing tool
 
-** Under development, NOT ready for use**
+**Under development, NOT ready for use**
 
 Temperature is read from the Raspberry Pi CPU using:
 ```
@@ -52,7 +52,7 @@ chown -R www-data:www-data cgi-bin
 ```
 
 ##### Using spinning hard drive for data storage
-March 24, 2016
+* Add note about how often file system gets accessed
 Changed RRDDIR data dir to ```/media/disk/rrd/var/lib/cbw/rrdtemp```
 Was here: RRDDIR ```/home/<user>/var/lib/cbw/rrdtemp```
 
