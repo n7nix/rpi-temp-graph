@@ -1,6 +1,13 @@
 # rpi-temp-graph
-Plot Raspberry Pi temperature on a graph using RRD
+Plot Raspberry Pi temperature on a graph using [RRD](https://oss.oetiker.ch/rrdtool/)
 
+Temperature is read from the Raspberry Pi CPU temperature using:
+```
+vcgencmd measure_temp
+```
+As an option a DHT11 temperature sensor for ambient temperature is also supported.
+* DHT11 from [Sunfounder](https://www.sunfounder.com/humiture-sensor-module.html)
+* DHT11 from [SongHe](https://www.amazon.com/gp/product/B07T7ZR7MS/ref=ppx_yo_dt_b_search_asin_title) sold on Amazon
 
 ### Intall RRDtool and Supporting Programs for Scripts
 
@@ -14,9 +21,12 @@ apt-get install libxml-simple-perl
 ### Supporting scripts
 
 ##### rpicpu_gettemp.sh
+* Used by db_rpitempupdate.sh to get current temperature(s)
 ##### db_rpitempbuilder.sh
+* Used once at initial install to build first data base files
 ##### db_rpitempudpate.sh
-```
+* Called from crontab to update current temperature in RRD database
+
 
 ### Install instructions
 
