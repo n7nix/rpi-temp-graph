@@ -1,7 +1,9 @@
 # rpi-temp-graph
-Plot Raspberry Pi temperature on a graph using [RRD](https://oss.oetiker.ch/rrdtool/)
+Plot Raspberry Pi temperature on a graph using [RRD](https://oss.oetiker.ch/rrdtool/) logging & graphing tool
 
-Temperature is read from the Raspberry Pi CPU temperature using:
+** Under development, NOT ready for use**
+
+Temperature is read from the Raspberry Pi CPU using:
 ```
 vcgencmd measure_temp
 ```
@@ -12,10 +14,7 @@ As an option a DHT11 temperature sensor for ambient temperature is also supporte
 ### Intall RRDtool and Supporting Programs for Scripts
 
 ```
-apt-get update
-apt-get install rrdtool
-apt-get install librrds-perl
-apt-get install libxml-simple-perl
+apt-get install rrdtool librrds-perl libxml-simple-perl
 ```
 
 ### Supporting scripts
@@ -30,7 +29,7 @@ apt-get install libxml-simple-perl
 
 ### Install instructions
 
-* create directory RRDDIR /home/<user>/var/lib/cbw/rrdtemp
+* create directory RRDDIR ```/home/<user>/var/lib/cbw/rrdtemp```
 * run db_rpitempbuilder.sh
 * run db_rpitempupdate.sh as cron job every 5 min.
   * this calls script rpicpu_gettemp.sh
@@ -54,8 +53,8 @@ chown -R www-data:www-data cgi-bin
 
 ##### Using spinning hard drive for data storage
 March 24, 2016
-Changed RRDDIR data dir to /media/disk/rrd/var/lib/cbw/rrdtemp
-Was here: RRDDIR /home/<user>/var/lib/cbw/rrdtemp
+Changed RRDDIR data dir to ```/media/disk/rrd/var/lib/cbw/rrdtemp```
+Was here: RRDDIR ```/home/<user>/var/lib/cbw/rrdtemp```
 
 ### Crontab
 
