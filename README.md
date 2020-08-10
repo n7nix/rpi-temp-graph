@@ -14,7 +14,7 @@ As an option a DHT11 temperature sensor for ambient temperature is also supporte
 ### Intall RRDtool and Supporting Programs for Scripts
 
 ```
-apt-get install rrdtool librrds-perl libxml-simple-perl
+apt-get install rrdtool librrds-perl libxml-simple-perl lighttpd
 ```
 
 ### Supporting scripts
