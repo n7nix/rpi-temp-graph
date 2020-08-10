@@ -1,52 +1,48 @@
 #!/bin/sh
 
-# CBW read pump house temperatures
+# RPi CPU temperatures
 
 PATH=/usr/bin:/bin
-user=$(whoami)
-CBWTEMP=/home/$user/bin/cbw_gettemp.sh
+MNTPNT="$HOME"
+RRDDIR="$MNTPNT/var/lib/rpi/rrdtemp"	# Should be the same as RRDDIR in db_rpitempupupdate.sh
+					# Where the RRD files will be stored. NO TRAILING SLASH
+TMPDIR=$MNTPNT/var/tmp/rpitemp		# Where the png temp files will be stored. NO TRAILING SLASH
+
+# Scripts to pull temperature values
+RPITEMP=$HOME/bin/rpicpu_gettemp.sh
+AMBTEMP=$HOME/bin/rpiamb_gettemp.sh
 
 ##########################################################################################
 ################ EDIT THE FOLLOWING LINES TO MATCH YOUR CONFIGURATION ####################
 ##########################################################################################
 
-UNIT=m 				# "m" for metric units or "e" for english units
-TMPDIR=/var/tmp/cbwtemp		# Where the temp files will be stored. NO TRAILING SLASH
-RRDDIR="/home/$user/var/lib/cbw/rrdtemp"	# This should be the same as RRDDIR in db_builder.sh
-						# Where the RRD files will be stored. NO TRAILING SLASH
-WWWUSER=www-data			# The web server user
-WWWGROUP=www-data			# The web server group
+UNIT=e 				# "m" for metric units or "e" for english units
 
-DEBUG=n				# Enable debug mode (y/n).
+
+WWWUSER=www-data		# The web server user
+WWWGROUP=www-data		# The web server group
+
+DEBUG=y				# Enable debug mode (y/n).
 				# When debug mode is enabled, the DB's are not updated
 
-	if [ -d "${TMPDIR}" ];
-		then
-			cd ${TMPDIR}
-		else
-			mkdir ${TMPDIR}
-			chown ${WWWUSER}:${WWWGROUP} ${TMPDIR}
-			chmod 777 ${TMPDIR}
-			cd ${TMPDIR}
-	fi
+if [ ! -d "${TMPDIR}" ]; then
+    mkdir -p ${TMPDIR}
+    chown ${WWWUSER}:${WWWGROUP} ${TMPDIR}
+    chmod 777 ${TMPDIR}
+fi
 
-	cd ${TMPDIR}
+cd ${TMPDIR}
 
-	TEMP1=$($CBWTEMP 1)
-	TEMP2=$($CBWTEMP 2)
-	TEMP3=$($CBWTEMP 3)	
+RPITEMP1=$($RPITEMP)
+AMBTEMP1=$($AMBTEMP)
 
-		if [ ${DEBUG} = "y" ]
-		   then
-			echo "Values found"
-			echo "==============="
-			echo "Pump house high temperature    :" ${TEMP1}
-			echo "Pump house outside temperature :" ${TEMP2}
-			echo "Pump house low temperature     :" ${TEMP3}
-
-		   else
-			rrdtool update ${RRDDIR}/highpumphouse.rrd N:${TEMP1}
-			rrdtool update ${RRDDIR}/outsidepumphouse.rrd N:${TEMP2}
-			rrdtool update ${RRDDIR}/lowpumphouse.rrd N:${TEMP3}
-		fi
+if [ ${DEBUG} = "y" ] ; then
+    echo "Values found"
+    echo "==============="
+    echo "RPi core temperature    : ${RPITEMP1}"
+    echo "Ambient temperature     : ${AMBTEMP1}"
+else
+    rrdtool update ${RRDDIR}/rpicpu.rrd N:${RPITEMP1}
+    rrdtool update ${RRDDIR}/rpiamb.rrd N:${AMBTEMP1}
+fi
 
