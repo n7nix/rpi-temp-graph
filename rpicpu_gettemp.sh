@@ -1,6 +1,24 @@
 #/bin/bash
 
-temp=$(vcgencmd measure_temp | cut -f2 -d'=' | cut -f1 -d"'")
+DEBUG=
+REMOTE=false
+
+# local cpu temperature read
+getcpu_temp="vcgencmd measure_temp"
+
+
+# Check if there are any args on command line
+if (( $# != 0 )) ; then
+    DEBUG=1
+fi
+
+if [ $REMOTE = true ] ; then
+    # remote cpu temperature read
+    getcpu_temp="ssh pi@10.0.42.37 'vcgencmd measure_temp'"
+fi
+
+
+temp=$($getcpu_temp | cut -f2 -d'=' | cut -f1 -d"'")
 temp_int=$(echo $temp | cut -f1 -d'.')
 temp_dec=$(echo $temp | cut -f2 -d'.')
 
@@ -18,4 +36,8 @@ else
     echo "Error temp: $temp"
 fi
 
-echo "Temp raw: $temp, int: $temp_int, dec: $temp_dec, fah: $temp_fah, fah1: $temp_fah1"
+if [ ! -z "$DEBUG" ] ; then
+    echo "Temp raw: $temp, int: $temp_int, dec: $temp_dec, fah: $temp_fah, fah1: $temp_fah1"
+else
+    echo "$temp_fah"
+fi
