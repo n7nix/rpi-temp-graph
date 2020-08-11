@@ -25,10 +25,18 @@ WWWGROUP=www-data		# The web server group
 DEBUG=y				# Enable debug mode (y/n).
 				# When debug mode is enabled, the DB's are not updated
 
+CHOWN="chown"
+CHMOD="chmod"
+# Running as root?
+if [[ $EUID != 0 ]] ; then
+    CHOWN="sudo chown"
+    CHMOD="sudo chmod"
+fi
+
 if [ ! -d "${TMPDIR}" ]; then
     mkdir -p ${TMPDIR}
-    chown ${WWWUSER}:${WWWGROUP} ${TMPDIR}
-    chmod 777 ${TMPDIR}
+    $CHOWN ${WWWUSER}:${WWWGROUP} ${TMPDIR}
+    $CHMOD 777 ${TMPDIR}
 fi
 
 cd ${TMPDIR}
