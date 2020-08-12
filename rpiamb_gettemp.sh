@@ -11,7 +11,7 @@ fi
 
 if [ $REMOTE = true ] ; then
     # remote ambient temperature read
-    getdht11_temp="ssh pi@10.0.42.37 bin/dht11_temp"
+    getdht11_temp="ssh pi@10.0.42.37 $HOME/bin/dht11_temp"
 fi
 
 # For raspberry pi with DHT11 temperature sensor

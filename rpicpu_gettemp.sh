@@ -1,11 +1,14 @@
-#/bin/bash
+#!/bin/bash
 
 DEBUG=
 REMOTE=false
 
 # local cpu temperature read
-getcpu_temp="vcgencmd measure_temp"
+getcpu_temp="/usr/bin/vcgencmd measure_temp"
 
+function dbgecho { if [ ! -z "$DEBUG" ] ; then echo "$*"; fi }
+
+# ===== main
 
 # Check if there are any args on command line
 if (( $# != 0 )) ; then
@@ -14,7 +17,7 @@ fi
 
 if [ $REMOTE = true ] ; then
     # remote cpu temperature read
-    getcpu_temp="ssh pi@10.0.42.37 'vcgencmd measure_temp'"
+    getcpu_temp="ssh pi@10.0.42.37 '/usr/bin/vcgencmd measure_temp'"
 fi
 
 
@@ -24,10 +27,10 @@ temp_dec=$(echo $temp | cut -f2 -d'.')
 
 if [ ! -z "$temp" ] ; then
 
-    echo "Compute Fahrenheit: $temp_int C"
+    dbgecho "Compute Fahrenheit: $temp_int C"
     if ((temp_dec >= 5)) ; then
         ((temp_int++))
-        echo "Bump temp_int"
+        dbgecho "Bump temp_int"
     fi
     temp_fah=$(( ((9 * temp_int)+160)/5 ))
     temp_fah1=$(( ((9 * temp_int)/5)+32 ))
