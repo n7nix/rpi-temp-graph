@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # RPi CPU temperatures
 
@@ -9,8 +9,8 @@ RRDDIR="$MNTPNT/var/lib/rpi/rrdtemp"	# Should be the same as RRDDIR in db_rpitem
 TMPDIR=$MNTPNT/var/tmp/rpitemp		# Where the png temp files will be stored. NO TRAILING SLASH
 
 # Scripts to pull temperature values
-RPITEMP=$HOME/bin/rpicpu_gettemp.sh
-AMBTEMP=$HOME/bin/rpiamb_gettemp.sh
+RPITEMP="$HOME/bin/rpicpu_gettemp.sh"
+AMBTEMP="$HOME/bin/rpiamb_gettemp.sh"
 
 ##########################################################################################
 ################ EDIT THE FOLLOWING LINES TO MATCH YOUR CONFIGURATION ####################
@@ -22,13 +22,13 @@ UNIT=e 				# "m" for metric units or "e" for english units
 WWWUSER=www-data		# The web server user
 WWWGROUP=www-data		# The web server group
 
-DEBUG=y				# Enable debug mode (y/n).
+DEBUG=n				# Enable debug mode (y/n).
 				# When debug mode is enabled, the DB's are not updated
 
 CHOWN="chown"
 CHMOD="chmod"
 # Running as root?
-if [[ $EUID != 0 ]] ; then
+if [ $EUID != 0 ] ; then
     CHOWN="sudo chown"
     CHMOD="sudo chmod"
 fi
