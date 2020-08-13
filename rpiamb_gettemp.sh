@@ -1,8 +1,9 @@
 #!/bin/bash
 DEBUG=
 REMOTE=false
+user=$(whoami)
 # local ambient temperature read
-getdht11_temp=$HOME/bin/dht11_temp
+getdht11_temp="/home/$user/bin/dht11_temp"
 
 # Check if there are any args on command line
 if (( $# != 0 )) ; then
@@ -19,7 +20,8 @@ temp=$($getdht11_temp)
 loopcnt=0
 
 while [ -z "$temp" ] && [ $loopcnt -le 6 ]; do
-    temp=$($getdht11temp)
+    sleep .5
+    temp=$($getdht11_temp)
     ((loopcnt++))
 done
 
