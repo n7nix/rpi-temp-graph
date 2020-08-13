@@ -49,6 +49,11 @@ sub graph_temperature($$$)
 	my $title = shift;
 	my $step = $range*$points_per_sample/$xpoints;
 
+        # red line:   #DD3F4A:
+        # green line: #2E993D
+        # blue line:  #3F4ADD
+        # purple line:#BA05C3
+
 	my ($graphret,$xs,$ys) = RRDs::graph($file,
 		'--imgformat', 'PNG',
 		'--width', $xpoints,
@@ -68,7 +73,7 @@ sub graph_temperature($$$)
 		"GPRINT:cpu_c:MAX: %5.2lf $temp_units",
 		"GPRINT:cpu_c:AVERAGE: %5.2lf $temp_units",
 		"GPRINT:cpu_c:LAST: %5.2lf $temp_units\\n",
-		'LINE2:ambient_c#DD3F4A:Ambient    ',
+		'LINE2:ambient_c#3F4ADD:Ambient    ',
   	        "GPRINT:ambient_c:MIN: %6.2lf $temp_units",
 		"GPRINT:ambient_c:MAX: %6.2lf $temp_units",
 		"GPRINT:ambient_c:AVERAGE: %6.2lf $temp_units",
