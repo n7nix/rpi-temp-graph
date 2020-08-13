@@ -228,16 +228,6 @@ sub display_current()
 
 	print " 			</tbody>\n";
 	print " 			</table>\n";
-
-#	print "<h1>Greenhouse outside temperature is \n";
-#	$hash = RRDs::info "$db_grnhos";
-#	foreach my $key (keys %$hash){
-#		if($key =~ /last_ds/){
-#			printf "%12.1f ", $$hash{$key}, "</h1>";
-#		}
-#    }
-
-
 }
 
 sub send_image($)
