@@ -177,7 +177,7 @@ HEADER
 
 	for my $n (0..$#graphs) {
 		print "<div class=\"graphtitle\"><h2>".$graphs[$n]{title}."</h2></div>\n";
-		print "<p><img src=\"$scriptname?${n}-temperature\" alt=\"RRDWeather\"/></p>\n";
+		print "<p><img src=\"$scriptname?${n}-temperature\" alt=\"RRDrpi\"/></p>\n";
 	}
 
 
@@ -253,7 +253,7 @@ sub main()
 	my $img = $ENV{QUERY_STRING};
 	if(defined $img and $img =~ /\S/) {
 		if($img =~ /^(\d+)-temperature$/) {
-			my $file = "$tmp_dir/RRDWeather_$1_temperature.png";
+			my $file = "$tmp_dir/RRDrpi_$1_temperature.png";
 			graph_temperature($graphs[$1]{seconds}, $file, $graphs[$1]{title});
 			send_image($file);
 		} else {
