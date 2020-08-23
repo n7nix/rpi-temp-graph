@@ -2,6 +2,9 @@
 
 scriptname="`basename $0`"
 user="pi"
+REPO_NAME="rpi-temp-graph"
+CP="cp"
+CHOWN="sudo chown"
 
 # Refresh scripts only
 b_refresh_only=false
@@ -29,28 +32,28 @@ function cfg_lighttpd() {
     is_pkg_installed $pkg_name
     if [ $? -eq 0 ] ; then
         echo "Remove $pkg_name package"
-        apt-get remove -y -q $pkg_name
+        sudo apt-get remove -y -q $pkg_name
     fi
     pkg_name="lighttpd"
     is_pkg_installed $pkg_name
     if [ $? -ne 0 ] ; then
         echo "Installing $pkg_name package"
-        apt-get install -y -q $pkg_name
+        sudo apt-get install -y -q $pkg_name
     fi
 
     if [ ! -d "/var/log/lighttpd" ] ; then
-        mkdir -p "/var/log/lighttpd"
-        touch "/var/log/lighttpd/error.log"
+        sudo mkdir -p "/var/log/lighttpd"
+        sudo touch "/var/log/lighttpd/error.log"
     fi
 
-    chown -R www-data:www-data "/var/log/lighttpd"
+    $CHOWN -R www-data:www-data "/var/log/lighttpd"
 
     lighttpd-enable-mod fastcgi
     lighttpd-enable-mod fastcgi-php
     ls -l /etc/lighttpd/conf-enabled
 
     # If you're using lighttpd, add the following to your configuration file:
-    cat << 'EOT' >> $lighttpdcfg_file
+    sudo cat << 'EOT' >> $lighttpdcfg_file
 # deny access to /data directory
 $HTTP["url"] =~ "^/data/" {
      url.access-deny = ("")
@@ -58,8 +61,8 @@ $HTTP["url"] =~ "^/data/" {
 EOT
     # back this file up until verified
     lighttpd_conf_avail_dir="/etc/lighttpd/conf-available"
-    cp $lighttpd_conf_avail_dir/15-fastcgi-php.conf $lighttpd_conf_avail_dir/15-fastcgi-php.bak1.conf
-    cat << EOT > $lighttpd_conf_avail_dir/15-fastcgi-php.conf
+    sudo cp $lighttpd_conf_avail_dir/15-fastcgi-php.conf $lighttpd_conf_avail_dir/15-fastcgi-php.bak1.conf
+    sudo cat << EOT > $lighttpd_conf_avail_dir/15-fastcgi-php.conf
 # -*- depends: fastcgi -*-
 # /usr/share/doc/lighttpd/fastcgi.txt.gz
 # http://redmine.lighttpd.net/projects/lighttpd/wiki/Docs:ConfigurationOptions#mod_fastcgi-fastcgi
@@ -77,7 +80,7 @@ EOT
     # and uncomment the line cgi.fix_pathinfo=1:
     php_filename="/etc/php/$PHPVER/fpm/php.ini"
     if [ -e "$php_filename" ] ; then
-        sed -i -e '/cgi\.fix_pathinfo=/s/^;//' "$php_filename"
+        sudo sed -i -e '/cgi\.fix_pathinfo=/s/^;//' "$php_filename"
     else
         echo "   ERROR: php config file: $php_filename does not exist"
     fi
@@ -91,7 +94,28 @@ EOT
 
     # Restart lighttpd
     echo "lighttpd force-reload"
-    service lighttpd force-reload
+    sudo service lighttpd force-reload
+}
+
+# ===== function setup_crontab
+function setup_crontab() {
+    # Does user have a crontab?
+    crontab -u $user -l > /dev/null 2>&1
+    if [ $? -ne 0 ] ; then
+        echo "user: $user does NOT have a crontab, creating"
+        crontab -u $user -l ;
+       {
+           echo "# m h  dom mon dow   command"
+           echo "*/5  *   *   *   *  /bin/bash /home/$user/bin/db_rpitempupdate.sh"
+       } | crontab -u $user -
+    else
+        echo "user: $user already has a crontab"
+    fi
+
+    echo "$user crontab looks like this:"
+    echo
+    crontab -l -u $user
+    echo
 }
 
 # ===== function usage
@@ -107,11 +131,11 @@ function usage() {
 # ===== main
 
 echo
-echo "temperature graph install START"
+echo "temperature graph install START at $(date)"
 
 # Be sure we're running as root
-if [[ $EUID != 0 ]] ; then
-   echo "Must be root."
+if [[ $EUID = 0 ]] ; then
+   echo "Do NOT run as root."
    exit 1
 fi
 
@@ -166,10 +190,16 @@ if [ "$needs_pkg" = "true" ] ; then
    fi
 fi
 
-if ! $b_refresh_only ; then
+SRC_DIR=/home/$user/dev/github/$REPO_NAME
+echo "DEBUG only: change directory to: $SRC_DIR"
+cd $SRC_DIR
+pwd
+
+if $b_refresh_only ; then
     echo
     echo "Configure lighttpd"
     #cfg_lighttpd
+    exit 0
 fi
 
 # For reference: get filename extension
@@ -182,18 +212,35 @@ echo "Update rrd scripts"
 
 BINDIR="/home/$user/bin"
 CGI_BINDIR="/var/www/cgi-bin"
-FILE_LIST="db_rpitempupdate.sh rpicpu_gettemp.sh rpiamb_gettemp.sh dht11/dht11_temp rpitemp.cgi"
+FILE_LIST="db_rpitempupdate.sh db_rpitempbuilder.sh rpicpu_gettemp.sh rpiamb_gettemp.sh dht11/dht11_temp rpitemp.cgi"
 for file_name in `echo ${FILE_LIST}` ; do
+
     # Look at filename extension
     exten="${file_name##*.}"
     if [ "$exten" = "cgi" ] ; then
         diff $file_name $CGI_BINDIR/ > /dev/null 2>&1
         retcode="$?"
         destdir=$CGI_BINDIR
+        CP="sudo cp"
     else
         diff $file_name $BINDIR > /dev/null 2>&1
         retcode="$?"
         destdir=$BINDIR
+    fi
+
+    # Determine if executable exists to read dht11 sensor
+    if [[ -x "$file_name" ]] ; then
+        dbgecho "$file_name found executable"
+    else
+        pushd dht11
+        make
+        if [ "$?" -eq 0 ] ; then
+            echo "$file_name build successful"
+        else
+            echo "$file_name build FAILED"
+        fi
+        popd
+        $CHOWN -R $user:$user dht11
     fi
 
     case $retcode in
@@ -201,11 +248,12 @@ for file_name in `echo ${FILE_LIST}` ; do
             echo "No update required for file: $file_name"
             ;;
         1)
-            echo "updating file: $file_name to destination: $destdir"
-            cp -u $file_name $destdir
+            echo "Updating file: $file_name to destination: $destdir"
+            $CP -u $file_name $destdir
             ;;
         2)
-            echo "File: $file_name does not exist"
+            echo "Copy file: $file_name to destination: $destdir"
+            $CP $file_name $destdir
             ;;
         *)
             echo "Return code: $retcode, not recognized"
@@ -213,9 +261,29 @@ for file_name in `echo ${FILE_LIST}` ; do
     esac
 done
 
+if [ -d "/home/$user/var/lib/rpi/rrdtemp" ] && [ -d "/home/$user/var/tmp/rpitemp" ] ; then
+    echo "About to over write database files:"
 
-#cp db_rpitempupdate.sh /home/$user/bin
-#cp rpicpu_gettemp.sh /home/$user/bin
-#cp rpiamb_gettemp.sh /home/$user/bin
-#cp dht11/dht11_temp /home/$user/bin
-#cp rpitemp.cgi /var/www/cgi-bin
+    ls -al /home/$user/var/lib/rpi/rrdtemp
+    ls -al /home/$user/var/tmp/rpitemp
+    echo
+   read -p "Over write graph files? (y or n): " -n 1 -r REPLY
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]] ; then
+        echo "Graph files unchanged ..."
+    else
+        $BINDIR/db_rpitempbuilder.sh
+        $CHOWN -R $user:$user /home/$user/var
+    fi
+
+else
+    mkdir -p "/home/$user/var/lib/rpi/rrdtemp"
+    mkdir -p "/home/$user/var/tmp/rpitemp"
+    $BINDIR/db_rpitempbuilder.sh
+    $CHOWN -R $user:$user /home/$user/var
+fi
+
+setup_crontab
+
+echo
+echo "temperature graph install FINISHED at $(date)"
