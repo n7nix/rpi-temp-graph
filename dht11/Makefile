@@ -54,5 +54,6 @@ dht11_temp:     $(TEMPSRC) $(HDRS) $(TEMPOBJS) Makefile
 # Clean up the object files for distribution
 clean:
 		rm -f $(OBJS)
+		rm -f $(TEMPOBJS)
 		rm -f core *.asc
-		rm -f humiture
+		rm -f humiture dhtll_temp
