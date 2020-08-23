@@ -29,7 +29,7 @@ apt-get install rrdtool librrds-perl libxml-simple-perl lighttpd
 
 ### Install instructions
 
-* create directory RRDDIR ```/home/<user>/var/lib/cbw/rrdtemp```
+* create directory RRDDIR ```/home/<user>/var/lib/rpi/rrdtemp```
 * run db_rpitempbuilder.sh
 * run db_rpitempupdate.sh as cron job every 5 min.
   * this calls script rpicpu_gettemp.sh
@@ -42,7 +42,7 @@ check /var/www/cgi-bin
 * setup owner group
 
 ```
-cd /home/<user>/var/lib/cbw/
+cd /home/<user>/var/lib/rpi/
 chown -R www-data:www-data rrdtemp
 ```
 
@@ -53,12 +53,12 @@ chown -R www-data:www-data cgi-bin
 
 ##### Using spinning hard drive for data storage
 * Add note about how often file system gets accessed
-Changed RRDDIR data dir to ```/media/disk/rrd/var/lib/cbw/rrdtemp```
-Was here: RRDDIR ```/home/<user>/var/lib/cbw/rrdtemp```
+Changed RRDDIR data dir to ```/media/disk/rrd/var/lib/rpi/rrdtemp```
+Was here: RRDDIR ```/home/<user>/var/lib/rpi/rrdtemp```
 
 ### Crontab
 
 * crontab entry
 ```
-*/5 *  * * *  /home/<user>/bin/db_cbwpumpupdate.sh
+*/5 *  * * *  /home/<user>/bin/db_rpitempupdate.sh
 ```
