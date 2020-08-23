@@ -30,6 +30,7 @@ echo
 echo "=== rrd file check ==="
 ls -al ~/var/lib/rpi/rrdtemp
 echo
+echo "=== png file check ==="
 ls -al ~/var/tmp/rpitemp
 
 echo
