@@ -17,7 +17,7 @@ b_refresh_only=false
 lighttpdcfg_file="/etc/lighttpd/lighttpd.conf"
 
 # List required packages
-PKG_REQUIRE="rrdtool librrds-perl libxml-simple-perl lighttpd"
+PKG_REQUIRE="rrdtool librrds-perl libxml-simple-perl lighttpd php-cgi"
 
 function dbgecho { if [ ! -z "$DEBUG" ] ; then echo "$*"; fi }
 
@@ -88,17 +88,33 @@ function cfg_lighttpd() {
     sudo lighttpd-enable-mod fastcgi
     ls -l /etc/lighttpd/conf-enabled
 
+    # Add these two lines to lighttpd.conf
+    # Note: make sure that mod_alias is loaded if you use this:
+    grep -i "cgi\.conf" $lighttpdcfg_file > /dev/null
+    retcode=$?
+    if [ "$retcode" -ne 0 ] ; then
+
+        sudo tee -a $lighttpdcfg_file > /dev/null << EOT
+alias.url += ( "/cgi-bin" => server.document-root + "/cgi-bin" )
+include "cgi.conf"
+EOT
+    else
+        echo "lighttpd.conf, already has cgi.conf entry."
+    fi
+
     grep -i "deny access to /data directory" $lighttpdcfg_file > /dev/null
     retcode=$?
-    echo "DEBUG: grep retcode: $retcode"
+    echo "DEBUG: grep deny access to: $retcode"
     if [ "$retcode" -ne 0 ] ; then
-    # If you're using lighttpd, add the following to your configuration file:
-        sudo tee -a $lighttpdcfg_file > /dev/null << 'EOT'
+        # If you're using lighttpd, add the following to your configuration file:
+        sudo tee -a $lighttpdcfg_file > /dev/null << EOT
 # deny access to /data directory
 $HTTP["url"] =~ "^/data/" {
      url.access-deny = ("")
 }
 EOT
+    else
+        echo "lighttpd.conf, already has a deny access to /data directory entry."
     fi
 
     if [ ! -f /etc/lighttpd/cgi.conf ] ; then
@@ -155,7 +171,7 @@ EOT
 
     # Change document root directory
     # server.document-root should be: /var/www
-#    sed -i -e '/server\.document-root / s/server\.document-root .*/server\.document-root = \"\/var\/www\/"/' /etc/lighttpd/lighttpd.conf
+    sed -i -e '/server\.document-root / s/server\.document-root .*/server\.document-root = \"\/var\/www\/"/' /etc/lighttpd/lighttpd.conf
 
     # Check for any configuration syntax errors
     lighttpd -t -f /etc/lighttpd/lighttpd.conf
@@ -314,7 +330,7 @@ done
 if [ "$needs_pkg" = "true" ] ; then
     echo
 
-    apt-get install -y -q $PKG_REQUIRE
+    sudo apt-get install -y -q $PKG_REQUIRE
     if [ "$?" -ne 0 ] ; then
         echo "$scriptname: package install failed. Please try this command manually:"
         echo "apt-get install -y $PKG_REQUIRE"
