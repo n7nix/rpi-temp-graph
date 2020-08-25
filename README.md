@@ -20,11 +20,14 @@ apt-get install rrdtool librrds-perl libxml-simple-perl lighttpd
 ### Supporting scripts
 
 ##### rpicpu_gettemp.sh
-* Used by db_rpitempupdate.sh to get current temperature(s)
+* Used by db_rpitempupdate.sh to get current temperature from CPU sensor
+##### rpiamb_gettemp.sh
+* Used by db_rpitempupdate.sh to get ambient temperature from dht11 device
+##### db_rpitempudpate.sh
+* Called from crontab to update current temperature in RRD databases
+
 ##### db_rpitempbuilder.sh
 * Used once at initial install to build first data base files
-##### db_rpitempudpate.sh
-* Called from crontab to update current temperature in RRD database
 
 
 ### Install instructions
