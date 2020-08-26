@@ -5,7 +5,6 @@
 use RRDs;
 use POSIX qw(strftime);
 
-my $hostname = hostname;
 my $hostname = `/bin/hostname`;
 # Get rid of CRLF string termination
 $hostname =~ s/[\x0A\x0D]//g;
