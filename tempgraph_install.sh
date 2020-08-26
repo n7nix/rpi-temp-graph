@@ -109,7 +109,7 @@ function cfg_lighttpd() {
         sudo tee -a $lighttpdcfg_file > /dev/null << 'EOT'
 alias.url += ( "/cgi-bin" => server.document-root + "/cgi-bin" )
 EOT
-        sudo sed -i -e '/include /a include "cgi.conf"' $lighttpdcfg_file
+        sudo sed -i -e '/^include /a include "cgi.conf"' $lighttpdcfg_file
     else
         echo "lighttpd.conf, already has cgi.conf entry."
     fi
