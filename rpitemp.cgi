@@ -5,7 +5,12 @@
 use RRDs;
 use POSIX qw(strftime);
 
-my $VERSION = "0.1";
+my $hostname = hostname;
+my $hostname = `/bin/hostname`;
+# Get rid of CRLF string termination
+$hostname =~ s/[\x0A\x0D]//g;
+
+my $VERSION = "0.2";
 
 ############################################################
 ############## EDIT THESE VALUES BELOW #####################
@@ -59,7 +64,7 @@ sub graph_temperature($$$)
 		'--width', $xpoints,
 		'--height', $ypoints,
 		'--start', "-$range",
-		"--title=  Raspberry Pi Temperatures",
+		"--title= Host $hostname Temperatures",
 		'--vertical-label', "Degrees $temp_units",
 		'--units-exponent', 0,
 		'--lazy',
@@ -96,7 +101,7 @@ sub print_html()
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html>
 <head>
-<title>Raspberry Pi Temperatures</title>
+<title>Host $hostname Temperatures</title>
 <meta http-equiv="pragma" content="no-cache"/>
 <meta http-equiv="refresh" content="600"/>
 <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1"/>
