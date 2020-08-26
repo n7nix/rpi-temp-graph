@@ -44,11 +44,17 @@ function start_service() {
         fi
     fi
 
-    $SYSTEMCTL --no-pager start "$service"
-    if [ "$?" -ne 0 ] ; then
-        echo "Problem starting $service"
-        systemctl status $service
-        exit
+    if systemctl is-active --quiet $service ; then
+        echo "$service is already running, forcing reload"
+        sudo service $service force-reload
+
+    else
+        $SYSTEMCTL start --no-pager $service.service
+        if [ "$?" -ne 0 ] ; then
+            echo "Problem starting $service"
+            systemctl status $service
+            exit 1
+        fi
     fi
 }
 
@@ -86,7 +92,13 @@ function cfg_lighttpd() {
 
     echo "DEBUG: About to enable lighttpd modules: CHOWN=$CHOWN"
     sudo lighttpd-enable-mod fastcgi
+    sudo lighttpd-enable-mod fastcgi-php
+
     ls -l /etc/lighttpd/conf-enabled
+
+    # Change document root directory
+    # server.document-root should be: /var/www
+    sudo sed -i -e '/server\.document-root / s/server\.document-root .*/server\.document-root = \"\/var\/www\/"/' /etc/lighttpd/lighttpd.conf
 
     # Add these two lines to lighttpd.conf
     # Note: make sure that mod_alias is loaded if you use this:
@@ -94,10 +106,10 @@ function cfg_lighttpd() {
     retcode=$?
     if [ "$retcode" -ne 0 ] ; then
 
-        sudo tee -a $lighttpdcfg_file > /dev/null << EOT
+        sudo tee -a $lighttpdcfg_file > /dev/null << 'EOT'
 alias.url += ( "/cgi-bin" => server.document-root + "/cgi-bin" )
-include "cgi.conf"
 EOT
+        sudo sed -i -e '/include /a include "cgi.conf"' $lighttpdcfg_file
     else
         echo "lighttpd.conf, already has cgi.conf entry."
     fi
@@ -107,7 +119,7 @@ EOT
     echo "DEBUG: grep deny access to: $retcode"
     if [ "$retcode" -ne 0 ] ; then
         # If you're using lighttpd, add the following to your configuration file:
-        sudo tee -a $lighttpdcfg_file > /dev/null << EOT
+        sudo tee -a $lighttpdcfg_file > /dev/null << 'EOT'
 # deny access to /data directory
 $HTTP["url"] =~ "^/data/" {
      url.access-deny = ("")
@@ -169,18 +181,12 @@ EOT
 
     fi # end if 1 = 0
 
-    # Change document root directory
-    # server.document-root should be: /var/www
-    sed -i -e '/server\.document-root / s/server\.document-root .*/server\.document-root = \"\/var\/www\/"/' /etc/lighttpd/lighttpd.conf
-
     # Check for any configuration syntax errors
     lighttpd -t -f /etc/lighttpd/lighttpd.conf
 
     # Restart lighttpd
-    echo "lighttpd force-reload"
+    echo "lighttpd reload configuration"
     start_service lighttpd
-
-    sudo service lighttpd force-reload
 }
 
 # ===== function update_graph_scripts
