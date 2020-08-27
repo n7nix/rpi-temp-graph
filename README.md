@@ -1,7 +1,30 @@
 # rpi-temp-graph
-* Plot Raspberry Pi temperatures on a graph using [RRD](https://oss.oetiker.ch/rrdtool/) logging & graphing tool
+* Plot Raspberry Pi temperatures on a graph using:
+  * [RRD](https://oss.oetiker.ch/rrdtool/) logging & graphing tool
+  * [lighttpd](https://www.lighttpd.net/)
 * If you install a DHT11 temperature sensor then both Raspberry Pi CPU &
 ambient temperatures are plotted.
+  * The external ambient temperature sensor for the plotting scripts
+  to work, it's
+
+### Briefly
+* Get this repo
+```
+git clone https://github.com/n7nix/rpi-temp-graph
+```
+* then run the install script
+```
+cd rpit-temp-graph
+./tempgraph_install.sh
+```
+* finally use your browser to view the graphs
+```
+url=http://localhost/cgi-bin/rpitemp.cgi
+or if you want to view on a different computer
+url=http://<some_ip_address>/cgi-bin/rpitemp.cgi
+ie.
+url=http://10.0.42.167/cgi-bin/rpitemp.cgi
+```
 
 ### Raspberry Pi CPU temperature
 Temperature is read from the Raspberry Pi CPU using:
@@ -14,7 +37,6 @@ supported. In both of these products I use a module & not the raw
 sensor
 
 * DHT11 from [Sunfounder](https://www.sunfounder.com/humiture-sensor-module.html)
-  *
 
 * DHT11 from [SongHe](https://www.amazon.com/gp/product/B07T7ZR7MS/ref=ppx_yo_dt_b_search_asin_title) sold on Amazon
   * [DHT11 Temperature and Humidity Sensor Module](https://quartzcomponents.com/products/dht11-temperature-humidity-sensor-module)
