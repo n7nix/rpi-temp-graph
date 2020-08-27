@@ -14,7 +14,7 @@ git clone https://github.com/n7nix/rpi-temp-graph
 ```
 * then run the install script
 ```
-cd rpit-temp-graph
+cd rpi-temp-graph
 ./tempgraph_install.sh
 ```
 * finally use your browser to view the graphs
