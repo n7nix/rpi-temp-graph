@@ -174,7 +174,7 @@ a:active
 </head>
 <body>
 HEADER
-	print "<h1>Raspberry Pi Temperatures</h1>\n";
+	print "<h1>Raspberry Pi $hostname Temperatures</h1>\n";
 	print "<h3>Reading CPU Core & dht11 sensors</h3>\n";
 
 	display_current();
