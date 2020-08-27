@@ -2,11 +2,8 @@
  * dht11_temp
  *
  * Program to read dht11 temperature sensor on a Raspberry Pi
- * Build like this:
- * WiringPi must be installed
- * gcc dht11_temp.c -I/usr/local/include -lwiringPi
  *
- * Can take an argument of WiringPi pin number 0 - 31
+ * Command line argument: WiringPi pin number 0 - 31
  * default WiringPi gpio number is DHTPIN
  */
 
@@ -19,6 +16,16 @@
 #define MAXTIMINGS 85
 #define MAXCOUNTER 48  /* was 50, 16 */
 
+/*
+ * Use:  `gpio readall` to translate between WiringPi & BCM gpio pin numbers
+ * Use:  `pinout` to get 40 pin header number
+ *  WiringPi   BCM  PI 40 pin header  DRAWS 8 pin Aux
+ *  --------   ---  ---------------   ---------------
+ *     0       17        11              n/a
+ *    21        5        29              3 (IO5)
+ *    22        6        31              2 (IO6)
+ */
+
 #define DHTPIN 0
 
 int dht11_dat[5] = {0,0,0,0,0};
@@ -26,6 +33,7 @@ int datacnt_total, datacnt_OK, datacnt_badnumbitsOK, datacnt_badnumbitslow;
 
 #define PINLOW_PERIOD 18    /* Milliseconds */
 #define PINHIGH_PERIOD 40   /* Microseconds */
+
 /* Set DEBUG to 1 to turn on debug display */
 #define DEBUG (0)
 #define debug_print(fmt, ...) \
