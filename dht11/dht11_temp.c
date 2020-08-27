@@ -1,13 +1,20 @@
 /*
- * Build like this:
- * gcc humiture.c -lwiringPi
+ * dht11_temp
  *
+ * Program to read dht11 temperature sensor on a Raspberry Pi
+ * Build like this:
+ * WiringPi must be installed
+ * gcc dht11_temp.c -I/usr/local/include -lwiringPi
+ *
+ * Can take an argument of WiringPi pin number 0 - 31
+ * default WiringPi gpio number is DHTPIN
  */
 
 #include <wiringPi.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <ctype.h>
 
 #define MAXTIMINGS 85
 #define MAXCOUNTER 48  /* was 50, 16 */
@@ -19,8 +26,15 @@ int datacnt_total, datacnt_OK, datacnt_badnumbitsOK, datacnt_badnumbitslow;
 
 #define PINLOW_PERIOD 18    /* Milliseconds */
 #define PINHIGH_PERIOD 40   /* Microseconds */
+/* Set DEBUG to 1 to turn on debug display */
+#define DEBUG (0)
+#define debug_print(fmt, ...) \
+    do { if (DEBUG) fprintf(stderr, fmt, ##__VA_ARGS__); } while (0)
 
-int read_dht11_dat()
+/*
+ * Routine to pull data out of the dht11
+ */
+int read_dht11_dat(int gpiopin)
 {
         uint8_t laststate = HIGH;
         uint8_t counter = 0;
@@ -29,28 +43,27 @@ int read_dht11_dat()
 
         dht11_dat[0] = dht11_dat[1] = dht11_dat[2] = dht11_dat[3] = dht11_dat[4] = 0;
 
-
         // pull pin down for 18 milliseconds
-        pinMode(DHTPIN, OUTPUT);
-        digitalWrite(DHTPIN, LOW);
+        pinMode(gpiopin, OUTPUT);
+        digitalWrite(gpiopin, LOW);
         delay(PINLOW_PERIOD);
         // then pull it up for 40 microseconds
-        digitalWrite(DHTPIN, HIGH);
+        digitalWrite(gpiopin, HIGH);
         delayMicroseconds(PINHIGH_PERIOD);
         /* prepare to read the pin */
-        pinMode(DHTPIN, INPUT);
+        pinMode(gpiopin, INPUT);
 
         // detect change and read data
         for ( i=0; i< MAXTIMINGS; i++) {
                 counter = 0;
-                while (digitalRead(DHTPIN) == laststate) {
+                while (digitalRead(gpiopin) == laststate) {
                         counter++;
                         delayMicroseconds(1);
                         if (counter == 255) {
                                 break;
                         }
                 }
-                laststate = digitalRead(DHTPIN);
+                laststate = digitalRead(gpiopin);
                /* printf( "%02x ", laststate); */
                 if (counter == 255) {
                         break;
@@ -108,16 +121,55 @@ int read_dht11_dat()
         return retcode;
 }
 
-int main (void)
+/*
+ * main
+ */
+int main (int argc, char **argv)
 {
         int retcode=0;
+        int gpiopin, gpiopin_use=DHTPIN;
 
         if (wiringPiSetup () == -1)
                 exit (1) ;
 
+        /*
+         * Qualify GPIO pin number from command line arg if present
+         */
+        /* is there an arg? */
+        if ( argc > 1 )  {
+                int argbad=0;
+                char *strptr;
+                int i;
+
+                /* get a pointer to command line arg */
+                strptr=argv[1];
+                /* iterate through all characters in arg */
+                for(i = 0; strptr[i] != '\0'; i++) {
+                        if ( isdigit(strptr[i]) == 0 ) {
+                                debug_print( "Found BAD argument %s, using default WiringPi GPIO: %d\n", argv[1], gpiopin_use);
+                                argbad=1;
+                                break;
+                        } else {
+                                debug_print( "Found good argument %c\n", strptr[i]);
+                        }
+                }
+                if (argbad == 0) {
+                        gpiopin = atoi(strptr);
+                        if ( gpiopin >= 0 && gpiopin < 32 ) {
+                                gpiopin_use=gpiopin;
+                        } else {
+                                debug_print("Invalid gpio number: %d, using default WiringPI GPIO: %d\n", gpiopin, gpiopin_use);
+                        }
+                }
+        } /* end if ( argc > 1 ) */
+        else {
+                debug_print("No arg, using default GPIO %d\n", gpiopin_use);
+        }
+        debug_print("Using GPIO %d\n", gpiopin_use);
+
         datacnt_total = datacnt_OK = datacnt_badnumbitsOK = datacnt_badnumbitslow = 0;
 
-        retcode=read_dht11_dat();
+        retcode=read_dht11_dat(gpiopin_use);
 
         return retcode;
 }
