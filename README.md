@@ -49,16 +49,16 @@ sensor
 
 ##### Sunfounder DHT11 using Raspberry Pi 40 pin header and BCM GPIO 17
 * Connects to 5V, GND and GPIO
-  * Pin reference: Run program ```pinout``` in a console window on a
+  * RPi 40 pin header pin reference: Run program ```pinout``` in a console window on a
   Raspberry Pi.
 ![Sunfounder DHT11 on RPi](/images/img_2633_resize.jpg)
 
 ##### SongHe DHT11 using DRAWS hat AUX connectory and BCM GPIO 6
 
 * Connects to 5V, GND and GPIO
-  * Pin reference: [DRAWS accessory
+  * DRAWS aux port pin reference: [DRAWS accessory
   connector](http://nwdigitalradio.com/wp-content/uploads/2020/08/DRAWSBrochure.pdf)
-  - scroll down to see Accessory Connectory HDR-4x2M Pinout
+  - scroll down to see Accessory Connectory HDR-4x2M pinout
 
 ![SongHe DHT11 on RPi](/images/img_2630_resize.jpg)
 
@@ -71,10 +71,13 @@ sensor
 * Used by db_rpitempupdate.sh to get ambient temperature from dht11 device
 ##### db_rpitempudpate.sh
 * Called from crontab to update current temperature in RRD databases
-
 ##### db_rpitempbuilder.sh
 * Used once at initial install to build first data base files
-
+##### amb_test.sh
+* Verify that dht11 temperature sensor is returning reasonable
+temperature values
+  * Takes a WiringPi pin number as an argument
+  * Default pin number is WiringPi pin 0, which is BCM pin17
 
 ### Install instructions
 * Use script: _tempgraph_install.sh_
