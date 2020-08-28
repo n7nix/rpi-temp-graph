@@ -4,8 +4,6 @@
   * [lighttpd](https://www.lighttpd.net/)
 * If you install a DHT11 temperature sensor then both Raspberry Pi CPU &
 ambient temperatures are plotted.
-  * The external ambient temperature sensor for the plotting scripts
-  to work, it's
 
 ### Briefly
 * Get this repo
@@ -25,6 +23,8 @@ url=http://<some_ip_address>/cgi-bin/rpitemp.cgi
 ie.
 url=http://10.0.42.167/cgi-bin/rpitemp.cgi
 ```
+* **NOTE: temperatures are read every 5 minutes so it may take a while to see
+any data graphing**
 
 ### Raspberry Pi CPU temperature
 Temperature is read from the Raspberry Pi CPU using:
@@ -74,13 +74,15 @@ sensor
 ### Install instructions
 * Use script: _tempgraph_install.sh_
 * Verify with script: _tempgraph_status.sh_
+* Use this url ```http://localhost/cgi-bin/rpitemp.cgi```
+and wait for data to plotted
 
 ### Manual Install instructions
 
 * The [install script tempgraph_install.sh](https://github.com/n7nix/rpi-temp-graph/blob/master/tempgraph_install.sh)
 does all of the following and this description is only included here for reference.
 
-### Intall RRDtool and Supporting Programs for Scripts
+### Install RRDtool and Supporting Programs
 
 ```
 apt-get install rrdtool librrds-perl libxml-simple-perl lighttpd
