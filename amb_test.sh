@@ -1,14 +1,36 @@
 #!/bin/bash
+#
+# Set WiringPi GPIO pin number to use
+#  Use:  `gpio readall` to translate between WiringPi & BCM gpio pin numbers
+#  Use:  `pinout` to get 40 pin header number
+#   WiringPi   BCM  PI 40 pin header  DRAWS 8 pin Aux
+#   --------   ---  ---------------   ---------------
+#      0        17        11              n/a
+#     21         5        29              3 (IO5)
+#     22         6        31              2 (IO6)
+#
+# Set DEBUG=1 for verbose output
+DEBUG=
+
+WIRINGPI_GPIO=0
+
+REMOTE=false
+IPADDRESS="10.0.42.37"
 
 # Test duration in seconds
-test_time=$((60*10))
-DEBUG=
-REMOTE=false
+test_time=$((60*5))
+
 user=$(whoami)
-# local ambient temperature read
-getdht11_temp="/home/$user/bin/dht11_temp"
 
 function dbgecho { if [ ! -z "$DEBUG" ] ; then echo "$*"; fi }
+
+# ===== function is_integer
+
+function is_integer() {
+#    [ "$1" -eq "$1" ] > /dev/null 2>&1
+    [[ $1 =~ ^-?[0-9]+$ ]]
+    return $?
+}
 
 # ===== function gettemp
 # For raspberry pi with DHT11 temperature sensor
@@ -35,15 +57,24 @@ function gettemp() {
 
 # ===== main
 
-
-# Check if there are any args on command line
+# Check if there are any args on command line and if it is numeric
 if (( $# != 0 )) ; then
-    DEBUG=1
+    echo "Verify arg: $1 is an integer"
+    is_integer $1
+    if [ $? = 0 ] ; then
+        WIRINGPI_GPIO=$1
+    else
+        echo "Argument: $1 is not an integer"
+    fi
 fi
+echo "Using GPIO number: $WIRINGPI_GPIO"
+
+# local ambient temperature read
+getdht11_temp="/home/$user/bin/dht11_temp $WIRINGPI_GPIO"
 
 if [ $REMOTE = true ] ; then
     # remote ambient temperature read
-    getdht11_temp="ssh pi@10.0.42.37 $HOME/bin/dht11_temp"
+    getdht11_temp="ssh pi@${IPADDRESS} $HOME/bin/dht11_temp $WIRINGPI_GPIO"
 fi
 
 callcnt=0
