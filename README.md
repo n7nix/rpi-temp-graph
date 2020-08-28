@@ -26,14 +26,14 @@ url=http://10.0.42.167/cgi-bin/rpitemp.cgi
 * **NOTE: temperatures are read every 5 minutes so it may take a while to see
 any data graphing**
 
-### Raspberry Pi CPU temperature
+### Raspberry Pi CPU Temperature
 Temperature is read from the Raspberry Pi CPU using:
 ```
 vcgencmd measure_temp
 ```
-### Ambient temperature
+### Ambient Temperature
 For ambient temperature, only the DHT11 temperature sensor is
-supported. In both of these products I use a module & not the raw
+supported. For both of these products a module is used & not the raw
 sensor
 
 * DHT11 from [Sunfounder](https://www.sunfounder.com/humiture-sensor-module.html)
@@ -49,11 +49,16 @@ sensor
 
 ##### Sunfounder DHT11 using Raspberry Pi 40 pin header and BCM GPIO 17
 * Connects to 5V, GND and GPIO
+  * Pin reference: Run program ```pinout``` in a console window on a
+  Raspberry Pi.
 ![Sunfounder DHT11 on RPi](/images/img_2633_resize.jpg)
 
 ##### SongHe DHT11 using DRAWS hat AUX connectory and BCM GPIO 6
 
 * Connects to 5V, GND and GPIO
+  * Pin reference: [DRAWS accessory
+  connector](http://nwdigitalradio.com/wp-content/uploads/2020/08/DRAWSBrochure.pdf)
+  - scroll down to see Accessory Connectory HDR-4x2M Pinout
 
 ![SongHe DHT11 on RPi](/images/img_2630_resize.jpg)
 
