@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Raspberry Pi temps
+# Raspberry Pi CPU core temperature
 
 use RRDs;
 use POSIX qw(strftime);
