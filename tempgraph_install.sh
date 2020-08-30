@@ -96,9 +96,9 @@ function cfg_lighttpd() {
 
     ls -l /etc/lighttpd/conf-enabled
 
-    # Change document root directory
+    # Change first occurrence of string containing document root directory
     # server.document-root should be: /var/www
-    sudo sed -i -e '/server\.document-root / s/server\.document-root .*/server\.document-root = \"\/var\/www\/"/' /etc/lighttpd/lighttpd.conf
+    sudo sed -i -e '0,/server\.document-root / s/server\.document-root .*/server\.document-root = \"\/var\/www\/"/' /etc/lighttpd/lighttpd.conf
 
     # Add these two lines to lighttpd.conf
     # Note: make sure that mod_alias is loaded if you use this:
