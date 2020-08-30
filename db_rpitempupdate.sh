@@ -18,7 +18,6 @@ AMBTEMP="$HOME/bin/rpiamb_gettemp.sh"
 
 UNIT=e 				# "m" for metric units or "e" for english units
 
-
 WWWUSER=www-data		# The web server user
 WWWGROUP=www-data		# The web server group
 
