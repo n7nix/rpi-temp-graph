@@ -40,7 +40,7 @@ then
 	fi
 
 	rrdtool create ${RRDDIR}/rpicpu.rrd \
-	--start now - 10s \
+	--start now-10s \
 	DS:cpu:GAUGE:600:-50:150 \
 	RRA:AVERAGE:0.5:1:600 \
 	RRA:AVERAGE:0.5:6:700 \
@@ -56,7 +56,7 @@ then
         RRA:MAX:0.5:288:797
 
 	rrdtool create ${RRDDIR}/rpiamb.rrd \
-        --start now -10s \
+        --start now-10s \
         DS:ambient:GAUGE:600:-50:150 \
         RRA:AVERAGE:0.5:1:600 \
         RRA:AVERAGE:0.5:6:700 \
