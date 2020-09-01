@@ -261,6 +261,7 @@ function setup_crontab() {
        {
            echo "# m h  dom mon dow   command"
            echo "*/5  *   *   *   *  /bin/bash /home/$user/bin/db_rpitempupdate.sh"
+           echo "*    *   *   *   *  /bin/bash /home/$user/bin/db_rpicpuload_update.sh"
        } | crontab -u $user -
     else
         echo "user: $user already has a crontab"
