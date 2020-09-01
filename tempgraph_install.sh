@@ -193,7 +193,7 @@ EOT
 function update_graph_scripts() {
 
     CGI_BINDIR="/var/www/cgi-bin"
-    FILE_LIST="db_rpitempupdate.sh db_rpitempbuilder.sh rpicpu_gettemp.sh rpiamb_gettemp.sh dht11/dht11_temp rpitemp.cgi"
+    FILE_LIST="db_rpitempupdate.sh db_rpicpuload_update.sh db_rpitempbuilder.sh db_rpicpuload_builder.sh rpicpu_gettemp.sh rpiamb_gettemp.sh dht11/dht11_temp rpitemp.cgi"
     for file_name in `echo ${FILE_LIST}` ; do
 
         # Look at filename extension
