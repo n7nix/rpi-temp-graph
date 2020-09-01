@@ -45,7 +45,7 @@ then
 	fi
 
 	rrdtool create ${RRDDIR}/rpicpuload.rrd \
-	--start ${TIMESEC}-1000 \
+	--start now-10s \
         --step 60 \
 	DS:loadavg:GAUGE:120:0:10000 \
 	RRA:AVERAGE:0.5:1:1500 \
