@@ -32,6 +32,12 @@ else
    echo "Temp $program_name: $($program_name)"
 fi
 
+# This gets the 5 minute load average
+CPULOAD=$(cat /proc/loadavg | cut -f2 -d ' ')
+# scale it to fit with temperature graphs
+CPULOAD1=$(echo "($CPULOAD * 100) / 1" | bc )
+echo "CPU load average: $CPULOAD1"
+
 # Get lighttpd daemon status
 systemctl --no-pager status lighttpd > /dev/null 2>&1
 retcode="$?"
@@ -80,6 +86,13 @@ crontab -l | grep -i "db_rpitempupdate.sh"
 if [ $? -eq 0 ] ; then
     result="OK"
 else
-    result="MISSING"
+    result="MISSING rpi temperature update"
 fi
-echo "Crontab entery is $result"
+echo "Crontab entery for temperature is $result"
+crontab -l | grep -i "db_rpicpuload_update.sh"
+if [ $? -eq 0 ] ; then
+    result="OK"
+else
+    result="MISSING rpi CPU load average update"
+fi
+echo "Crontab entery for CPU load is $result"
