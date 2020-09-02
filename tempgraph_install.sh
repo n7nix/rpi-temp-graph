@@ -265,15 +265,15 @@ function setup_crontab() {
        } | crontab -u $user -
     else
         echo "user: $user already has a crontab, checking for both cron jobs"
-        result="Missing"
+        result="MISSING"
         crontab -l | grep -i "db_rpitempupdate.sh"
         if [ $? -eq 0 ] ; then
             result="OK"
         else
             echo "Installing rpi temperature update cron job"
-            {
-                echo "*/5  *   *   *   *  /bin/bash /home/$user/bin/db_rpitempupdate.sh"
-            } | crontab -u $user -
+            croncmd="/bin/bash /home/$user/bin/db_rpitempupdate.sh"
+            cronjob="*/5  *   *   *   *  $croncmd"
+            (crontab -l | grep -v -F "$croncmd";  echo "$cronjob") | crontab -u $user -
         fi
         echo "Crontab entery for temperature is $result"
 
@@ -281,12 +281,13 @@ function setup_crontab() {
         if [ $? -eq 0 ] ; then
             result="OK"
         else
-            result="MISSING rpi CPU load average update"
+            result="MISSING"
             echo "Installing rpi cpu load update cron job"
-            {
-                echo "*    *   *   *   *  /bin/bash /home/$user/bin/db_rpicpuload_update.sh"
-            } | crontab -u $user -
+            croncmd="/bin/bash /home/$user/bin/db_rpicpuload_update.sh"
+            cronjob="*  *   *   *   *  $croncmd"
+            (crontab -l | grep -v -F "$croncmd";  echo "$cronjob") | crontab -u $user -
         fi
+        echo "Crontab entery for CPU load is $result"
     fi
 
     echo "$user crontab looks like this:"
