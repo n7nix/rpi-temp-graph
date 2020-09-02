@@ -241,7 +241,7 @@ function update_graph_scripts() {
                 $CP $file_name $destdir
 
                 echo "DEBUG: Check directory: copy return: $?"
-                ls -al $destdir
+                ls -al $destdir/$file_name
             ;;
             *)
                 echo "Return code: $retcode, not recognized"
@@ -383,14 +383,15 @@ if [ -d "/home/$user/var/lib/rpi/rrdtemp" ] && [ -d "/home/$user/var/tmp/rpitemp
         echo "Graph files unchanged ..."
     else
         $BINDIR/db_rpitempbuilder.sh
+        $BINDIR/db_rpicpuload_builder.sh
         $CHOWN -R $user:$user /home/$user/var
         $CHOWN -R www-data:www-data /home/$user/var/tmp/rpitemp
     fi
-
 else
     mkdir -p "/home/$user/var/lib/rpi/rrdtemp"
     mkdir -p "/home/$user/var/tmp/rpitemp"
     $BINDIR/db_rpitempbuilder.sh
+    $BINDIR/db_rpicpuload_builder.sh
     $CHOWN -R $user:$user /home/$user/var
     $CHOWN -R www-data:www-data /home/$user/var/tmp/rpitemp
 fi
