@@ -315,7 +315,7 @@ function create_missing_rrd_files() {
         if [ -e "/home/$user/var/lib/rpi/rrdtemp/rpicpuload.rrd" ] ; then
             echo "Found CPU load database files"
         else
-            $BINDIR/db_rpicpuloadbuilder.sh
+            $BINDIR/db_rpicpuload_builder.sh
         fi
     else
         echo "Did not find required directories ... exiting"
