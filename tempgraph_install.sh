@@ -264,7 +264,29 @@ function setup_crontab() {
            echo "*    *   *   *   *  /bin/bash /home/$user/bin/db_rpicpuload_update.sh"
        } | crontab -u $user -
     else
-        echo "user: $user already has a crontab"
+        echo "user: $user already has a crontab, checking for both cron jobs"
+        result="Missing"
+        crontab -l | grep -i "db_rpitempupdate.sh"
+        if [ $? -eq 0 ] ; then
+            result="OK"
+        else
+            echo "Installing rpi temperature update cron job"
+            {
+                echo "*/5  *   *   *   *  /bin/bash /home/$user/bin/db_rpitempupdate.sh"
+            } | crontab -u $user -
+        fi
+        echo "Crontab entery for temperature is $result"
+
+        crontab -l | grep -i "db_rpicpuload_update.sh"
+        if [ $? -eq 0 ] ; then
+            result="OK"
+        else
+            result="MISSING rpi CPU load average update"
+            echo "Installing rpi cpu load update cron job"
+            {
+                echo "*    *   *   *   *  /bin/bash /home/$user/bin/db_rpicpuload_update.sh"
+            } | crontab -u $user -
+        fi
     fi
 
     echo "$user crontab looks like this:"
@@ -273,11 +295,74 @@ function setup_crontab() {
     echo
 }
 
+# ===== function create_missing_rrd_files
+# Only create missing RRD files
+
+function create_missing_rrd_files() {
+
+    echo
+    echo "Check database files & directories"
+
+    if [ -d "/home/$user/var/lib/rpi/rrdtemp" ] && [ -d "/home/$user/var/tmp/rpitemp" ] ; then
+
+        dbgecho "About to verify database files:"
+        if [ -e "/home/$user/var/lib/rpi/rrdtemp/rpicpu.rrd" ] && [ -e "/home/$user/var/lib/rpi/rrdtemp/rpiamb.rrd" ] ; then
+            echo "Found temperature database files"
+        else
+            $BINDIR/db_rpitempbuilder.sh
+        fi
+
+        if [ -e "/home/$user/var/lib/rpi/rrdtemp/rpicpuload.rrd" ] ; then
+            echo "Found CPU load database files"
+        else
+            $BINDIR/db_rpicpuloadbuilder.sh
+        fi
+    else
+        echo "Did not find required directories ... exiting"
+        exit 1
+    fi
+    $CHOWN -R www-data:www-data /home/$user/var/tmp/rpitemp
+    $CHOWN -R $user:$user /home/$user/var
+}
+
+# ===== function create_all_rrd_files
+function create_all_rrd_files() {
+
+    echo
+    echo "Verify database files & directories exist"
+
+    if [ -d "/home/$user/var/lib/rpi/rrdtemp" ] && [ -d "/home/$user/var/tmp/rpitemp" ] ; then
+        echo "About to over write database files:"
+
+        # display files in database and png directories
+        ls -al /home/$user/var/lib/rpi/rrdtemp
+        ls -al /home/$user/var/tmp/rpitemp
+        echo
+        read -p "Over write graph files? (y or n): " -n 1 -r REPLY
+        echo
+        if [[ ! $REPLY =~ ^[Yy]$ ]] ; then
+            echo "Graph files unchanged ..."
+        else
+            $BINDIR/db_rpitempbuilder.sh
+            $BINDIR/db_rpicpuload_builder.sh
+            $CHOWN -R $user:$user /home/$user/var
+            $CHOWN -R www-data:www-data /home/$user/var/tmp/rpitemp
+        fi
+    else
+        mkdir -p "/home/$user/var/lib/rpi/rrdtemp"
+        mkdir -p "/home/$user/var/tmp/rpitemp"
+        $BINDIR/db_rpitempbuilder.sh
+        $BINDIR/db_rpicpuload_builder.sh
+        $CHOWN -R $user:$user /home/$user/var
+        $CHOWN -R www-data:www-data /home/$user/var/tmp/rpitemp
+    fi
+}
+
 # ===== function usage
 
 function usage() {
    echo "Usage: $scriptname [-r][-d][-h]" >&2
-   echo "   -u   Update script files only"
+   echo "   -u   Update script & missig RRD files only"
    echo "   -d   Set debug flag"
    echo "   -h   Display this message"
    echo
@@ -301,7 +386,7 @@ while [[ $# -gt 0 ]] ; do
    case $key in
       -u|--update)
          b_refresh_only=true
-         echo "Refresh scripts only"
+         echo "Refresh scripts & missing RRD files only"
          ;;
       -d|--debug)
          DEBUG=1
@@ -359,44 +444,20 @@ echo
 echo "Update graph scripts, don't touch RRD database files"
 
 update_graph_scripts
+setup_crontab
+
 if $b_refresh_only ; then
     echo
-    echo "Updating scripts only"
+    echo "Updating scripts and missing rrd files only"
+    create_missing_rrd_files
+
     exit 0
 fi
 
- echo "DEBUG: Configure lighttpd"
- cfg_lighttpd
+echo "DEBUG: Configure lighttpd"
+cfg_lighttpd
 
-echo
-echo "Verify database files & directories exist"
-
-if [ -d "/home/$user/var/lib/rpi/rrdtemp" ] && [ -d "/home/$user/var/tmp/rpitemp" ] ; then
-    echo "About to over write database files:"
-
-    ls -al /home/$user/var/lib/rpi/rrdtemp
-    ls -al /home/$user/var/tmp/rpitemp
-    echo
-    read -p "Over write graph files? (y or n): " -n 1 -r REPLY
-    echo
-    if [[ ! $REPLY =~ ^[Yy]$ ]] ; then
-        echo "Graph files unchanged ..."
-    else
-        $BINDIR/db_rpitempbuilder.sh
-        $BINDIR/db_rpicpuload_builder.sh
-        $CHOWN -R $user:$user /home/$user/var
-        $CHOWN -R www-data:www-data /home/$user/var/tmp/rpitemp
-    fi
-else
-    mkdir -p "/home/$user/var/lib/rpi/rrdtemp"
-    mkdir -p "/home/$user/var/tmp/rpitemp"
-    $BINDIR/db_rpitempbuilder.sh
-    $BINDIR/db_rpicpuload_builder.sh
-    $CHOWN -R $user:$user /home/$user/var
-    $CHOWN -R www-data:www-data /home/$user/var/tmp/rpitemp
-fi
-
-setup_crontab
+create_all_rrd_files
 
 echo
 echo "temperature graph install FINISHED at $(date)"
