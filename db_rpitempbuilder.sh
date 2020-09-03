@@ -11,10 +11,10 @@ RRDDIR="$MNTPNT/var/lib/rpi/rrdtemp"	# This should be the same as RRDDIR in db_r
 ### YOU SHOULD NOT HAVE TO EDIT ANYTHING BELOW THIS LINE ##############################
 #######################################################################################
 
-clear
+#clear
 
 echo ""
-echo "RRDrpi : database builder"
+echo "RRDrpi : temperature database builder"
 echo "-----------------------------"
 echo "Are you sure you want to create the database files ?"
 echo -n "IT WILL OVERWRITE EXISTING DATA (y/n) "
@@ -22,26 +22,23 @@ read ANSWER
 echo ""
 
 
-if [ ${ANSWER} = "n" ]
-then
+if [ ${ANSWER} = "n" ] ; then
 	echo " "
 	echo "Exiting..."
 	echo " "
 	exit 0
 
-elif [ ${ANSWER} = "y" ]
-then
+elif [ ${ANSWER} = "y" ] ; then
 
 	cd
 
-	if [ ! -d ${RRDDIR} ]
-	then
-		mkdir -p ${RRDDIR}
+	if [ ! -d ${RRDDIR} ] ; then
+            mkdir -p ${RRDDIR}
 	fi
 
 	rrdtool create ${RRDDIR}/rpicpu.rrd \
 	--start now-10s \
-	DS:cpu:GAUGE:600:-50:150 \
+	DS:cpu:GAUGE:600:-10:190 \
 	RRA:AVERAGE:0.5:1:600 \
 	RRA:AVERAGE:0.5:6:700 \
 	RRA:AVERAGE:0.5:24:775 \
@@ -80,11 +77,9 @@ then
 	echo "Now, you can setup the db_rpitempupdate.sh script and a crontab entry to run it"
 
 else
-
 	echo " "
 	echo " y or n only!"
 	echo "Exiting..."
 	echo ""
 	exit 1
-
 fi
