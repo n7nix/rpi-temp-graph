@@ -9,7 +9,7 @@ my $hostname = `/bin/hostname`;
 # Get rid of CRLF string termination
 $hostname =~ s/[\x0A\x0D]//g;
 
-my $VERSION = "0.2";
+my $VERSION = "0.3";
 
 ############################################################
 ############## EDIT THESE VALUES BELOW #####################
@@ -197,7 +197,7 @@ HEADER
 	print <<FOOTER;
 <table border="0" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center">
  <a href="http://www.nwdigitalradio.com/" onclick="window.open(this.href); return false;">Basil Gunn</a>
-<a> $VERSION by</a>
+<a> $VERSION Sept 3, 2020 by</a>
 <a href="http://www.nwdigitalradio.com" onclick="window.open(this.href); return false;">Basil N7NIX</a></td></tr>
 </table>
 FOOTER
