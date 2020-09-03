@@ -8,6 +8,7 @@ use POSIX qw(strftime);
 my $hostname = `/bin/hostname`;
 # Get rid of CRLF string termination
 $hostname =~ s/[\x0A\x0D]//g;
+my $pi_type = `/home/pi/bin/piver.sh 1`;
 
 my $VERSION = "0.3";
 
@@ -183,7 +184,7 @@ a:active
 </head>
 <body>
 HEADER
-	print "<h1>Raspberry Pi $hostname Temperatures</h1>\n";
+	print "<h1>Raspberry $pi_type on $hostname Temperatures</h1>\n";
 	print "<h3>Reading CPU Core & dht11 sensors</h3>\n";
 
 	display_current();
