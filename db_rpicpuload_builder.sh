@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# RRD builder for RPi CPU temperature graph
+# RRD builder for RPi CPU load average graph
 
 PATH=/usr/bin:/bin
 
@@ -11,10 +11,10 @@ RRDDIR="$MNTPNT/var/lib/rpi/rrdtemp"	# This should be the same as RRDDIR in db_r
 ### YOU SHOULD NOT HAVE TO EDIT ANYTHING BELOW THIS LINE ##############################
 #######################################################################################
 
-clear
+#clear
 
 echo ""
-echo "RRDrpi : database builder"
+echo "RRDrpi : CPU load database builder"
 echo "-----------------------------"
 echo "Are you sure you want to create the database files ?"
 echo -n "IT WILL OVERWRITE EXISTING DATA (y/n) "
@@ -25,23 +25,22 @@ echo ""
 #	--start 1127253600 \
 
 
-if [ ${ANSWER} = "n" ]
-then
+if [ ${ANSWER} = "n" ] ; then
+
 	echo " "
 	echo "Exiting..."
 	echo " "
 	exit 0
 
-elif [ ${ANSWER} = "y" ]
-then
+elif [ ${ANSWER} = "y" ] ; then
+
         # Time in seconds since 1970
         TIMESEC=$(date "+%s")
 
 	cd
 
-	if [ ! -d ${RRDDIR} ]
-	then
-		mkdir -p ${RRDDIR}
+	if [ ! -d ${RRDDIR} ] ; then
+            mkdir -p ${RRDDIR}
 	fi
 
 	rrdtool create ${RRDDIR}/rpicpuload.rrd \
@@ -70,11 +69,9 @@ then
 	echo "Now, you can setup the db_rpicpuload_update.sh script and a crontab entry to run it"
 
 else
-
 	echo " "
 	echo " y or n only!"
 	echo "Exiting..."
 	echo ""
 	exit 1
-
 fi
