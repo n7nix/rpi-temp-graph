@@ -32,10 +32,10 @@ fi
 # Set command to use
 if [ $REMOTE = true ] ; then
     # remote ambient temperature read
-    getdht11_temp="ssh pi@${IPADDR} $HOME/bin/dht11_temp $WIRINGPI_GPIO"
+    getdht11_temp="ssh pi@${IPADDR} $HOME/bin/dht11_temp -g $WIRINGPI_GPIO"
 else
     # local ambient temperature read
-    getdht11_temp="/home/$user/bin/dht11_temp $WIRINGPI_GPIO"
+    getdht11_temp="/home/$user/bin/dht11_temp -g $WIRINGPI_GPIO"
 fi
 
 # Read the temperature sensor
