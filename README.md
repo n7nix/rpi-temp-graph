@@ -41,6 +41,15 @@ sensor
 * DHT11 from [SongHe](https://www.amazon.com/gp/product/B07T7ZR7MS/ref=ppx_yo_dt_b_search_asin_title) sold on Amazon
   * [DHT11 Temperature and Humidity Sensor Module](https://quartzcomponents.com/products/dht11-temperature-humidity-sensor-module)
 
+**NOTE:** Must edit _rpiamb_gettemp.sh_ script variable WIRINGPI_GPIO in
+directory ~/bin after intall for the WIRINGP_GPIO pin number used (0-31)
+```
+WIRINGPI_GPIO=
+```
+* Use console command:  _gpio readall_ to translate between WiringPi & BCM gpio pin numbers
+* Use console command:  _pinout_ to get 40 pin header number
+
+
 ### Screen shot of temperature plots
 
 ![CPU & Ambient temperature plot](/images/rpitemp.cgi-1366x768.png)
