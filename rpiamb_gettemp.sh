@@ -7,7 +7,7 @@
 # Any arguments on command line will set DEBUG flag
 DEBUG=
 
-# Set WiringPi GPIO pin number to use
+# NEED TO EDIT WiringPi GPIO pin number to use
 #  Use:  `gpio readall` to translate between WiringPi & BCM gpio pin numbers
 #  Use:  `pinout` to get 40 pin header number
 #   WiringPi   BCM  PI 40 pin header  DRAWS 8 pin Aux

@@ -41,8 +41,9 @@ sensor
 * DHT11 from [SongHe](https://www.amazon.com/gp/product/B07T7ZR7MS/ref=ppx_yo_dt_b_search_asin_title) sold on Amazon
   * [DHT11 Temperature and Humidity Sensor Module](https://quartzcomponents.com/products/dht11-temperature-humidity-sensor-module)
 
-**NOTE:** Must edit _rpiamb_gettemp.sh_ script variable WIRINGPI_GPIO in
-directory ~/bin after intall for the WIRINGP_GPIO pin number used (0-31)
+**NOTE: Must edit** _rpiamb_gettemp.sh_ script variable WIRINGPI_GPIO in
+directory ~/bin after intall for the WIRINGP_GPIO pin number used
+(0-31). Defaults to BCM GPIO 17 (WiringPi GPIO 0)
 ```
 WIRINGPI_GPIO=
 ```
@@ -86,7 +87,7 @@ WIRINGPI_GPIO=
 * Verify that dht11 temperature sensor is returning reasonable
 temperature values
   * Takes a WiringPi pin number as an argument
-  * Default pin number is WiringPi pin 0, which is BCM pin17
+  * Default GPIO is WiringPi GPIO 0, (BCM GPIO 17)
 
 ### Install instructions
 * Use script: _tempgraph_install.sh_
