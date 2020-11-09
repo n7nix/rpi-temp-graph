@@ -42,7 +42,7 @@ sensor
   * [DHT11 Temperature and Humidity Sensor Module](https://quartzcomponents.com/products/dht11-temperature-humidity-sensor-module)
 
 **NOTE: Must edit** _rpiamb_gettemp.sh_ script variable WIRINGPI_GPIO in
-directory ~/bin after intall for the WIRINGP_GPIO pin number used
+directory ~/bin after install for the WIRINGP_GPIO pin number used
 (0-31). Defaults to BCM GPIO 17 (WiringPi GPIO 0)
 ```
 WIRINGPI_GPIO=
