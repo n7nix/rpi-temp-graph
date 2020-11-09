@@ -51,7 +51,8 @@ WIRINGPI_GPIO=
 * Use console command:  _pinout_ to get 40 pin header number
 
 
-### Screen shot of temperature plots
+### Screen shot of temperature & CPU activity plots
+* The RPi is running ardop on 80 Meters
 
 ![CPU & Ambient temperature plot](/images/rpitemp.cgi-1366x768.png)
 
