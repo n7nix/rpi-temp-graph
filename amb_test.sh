@@ -1,5 +1,12 @@
 #!/bin/bash
 #
+# amb_test.sh
+# Continuously read the dht11 temperature module displaying,
+# temperature, loop cnt to get a valid read, total pass count
+#
+# Example:
+# ./amb_test.sh 21
+#
 # Set WiringPi GPIO pin number to use
 #  Use:  `gpio readall` to translate between WiringPi & BCM gpio pin numbers
 #  Use:  `pinout` to get 40 pin header number
@@ -21,8 +28,6 @@ IPADDRESS="10.0.42.37"
 test_time=$((60*5))
 
 user=$(whoami)
-# local ambient temperature read
-getdht11_temp="/home/$user/bin/dht11_temp -g $WIRINGPI_GPIO"
 
 function dbgecho { if [ ! -z "$DEBUG" ] ; then echo "$*"; fi }
 
@@ -45,7 +50,6 @@ function gettemp() {
     while [ -z "$temp" ] && [ $loopcnt -le 8 ]; do
         sleep .5
         temp=$($getdht11_temp)
-#        temp=$(/home/$user/bin/dht11_temp)
         ((loopcnt++))
     done
 
@@ -71,9 +75,12 @@ if (( $# != 0 )) ; then
 fi
 echo "Using GPIO number: $WIRINGPI_GPIO"
 
+# local ambient temperature read
+getdht11_temp="/home/$user/bin/dht11_temp -g $WIRINGPI_GPIO"
+
 if [ $REMOTE = true ] ; then
     # remote ambient temperature read
-    getdht11_temp="ssh pi@${IPADDRESS} $HOME/bin/dht11_temp $WIRINGPI_GPIO"
+    getdht11_temp="ssh pi@${IPADDRESS} $HOME/bin/dht11_temp -g $WIRINGPI_GPIO"
 fi
 
 callcnt=0
