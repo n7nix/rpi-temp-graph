@@ -21,6 +21,8 @@ IPADDRESS="10.0.42.37"
 test_time=$((60*5))
 
 user=$(whoami)
+# local ambient temperature read
+getdht11_temp="/home/$user/bin/dht11_temp -g $WIRINGPI_GPIO"
 
 function dbgecho { if [ ! -z "$DEBUG" ] ; then echo "$*"; fi }
 
@@ -68,9 +70,6 @@ if (( $# != 0 )) ; then
     fi
 fi
 echo "Using GPIO number: $WIRINGPI_GPIO"
-
-# local ambient temperature read
-getdht11_temp="/home/$user/bin/dht11_temp $WIRINGPI_GPIO"
 
 if [ $REMOTE = true ] ; then
     # remote ambient temperature read
