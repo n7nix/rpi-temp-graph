@@ -104,6 +104,9 @@ WIRINGPI_GPIO=
 temperature values
   * Takes a WiringPi pin number as an argument
   * Default GPIO is WiringPi GPIO 0, (BCM GPIO 17)
+```
+./amb_test.sh 21
+```
 
 ### Install instructions
 * Use script: _tempgraph_install.sh_
