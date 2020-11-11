@@ -1,5 +1,5 @@
 # rpi-temp-graph
-* Plot Raspberry Pi temperatures on a graph using:
+* Plot Raspberry Pi temperatures & CPU activity on a graph using:
   * [RRD](https://oss.oetiker.ch/rrdtool/) logging & graphing tool
   * [lighttpd](https://www.lighttpd.net/)
 * If you install a DHT11 temperature sensor then both Raspberry Pi CPU &
@@ -15,6 +15,21 @@ git clone https://github.com/n7nix/rpi-temp-graph
 cd rpi-temp-graph
 ./tempgraph_install.sh
 ```
+* verify install by running _tempgraph_status.sh_
+```
+./tempgraph_status.sh
+```
+* edit _rpiamb_gettemp.sh_ WIRINGPI_GPIO variable for GPIO used to read DHT11 module
+```
+cd
+cd bin
+nano rpiamb_gettemp.sh
+```
+* verify _rpiamb_gettemp.sh_ script returns a valid temperature
+```
+./rpiamb_gettemp.sh
+```
+
 * finally use your browser to view the graphs
 ```
 url=http://localhost/cgi-bin/rpitemp.cgi
