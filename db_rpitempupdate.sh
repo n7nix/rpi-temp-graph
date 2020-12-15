@@ -16,7 +16,7 @@ AMBTEMP="$HOME/bin/rpiamb_gettemp.sh"
 ################ EDIT THE FOLLOWING LINES TO MATCH YOUR CONFIGURATION ####################
 ##########################################################################################
 
-UNIT=e 				# "m" for metric units or "e" for english units
+UNIT=F 				# "f" for Fahrenheit units or "c" for Celsius units
 
 WWWUSER=www-data		# The web server user
 WWWGROUP=www-data		# The web server group
@@ -40,8 +40,8 @@ fi
 
 cd ${TMPDIR}
 
-RPITEMP1=$($RPITEMP)
-AMBTEMP1=$($AMBTEMP)
+RPITEMP1=$($RPITEMP -u $UNIT)
+AMBTEMP1=$($AMBTEMP -u $UNIT)
 
 if [ ${DEBUG} = "y" ] ; then
     echo "Values found"

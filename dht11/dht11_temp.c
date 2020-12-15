@@ -35,11 +35,12 @@
 
 extern char *__progname;
 const char * getprogname(void);
+int read_dht11_dat(int gpiopin, char tempunit);
 
 struct _conf {
         int debug;
         int gpio;
-        char *unit;
+        char unit;
 } conf;
 
 int dht11_dat[5] = {0,0,0,0,0};
@@ -90,7 +91,7 @@ int check_gpio_pin(char *gpio_str, struct _conf *cfg) {
 /*
  * Routine to pull data out of the dht11
  */
-int read_dht11_dat(int gpiopin)
+int read_dht11_dat(int gpiopin, char tempunit)
 {
         uint8_t laststate = HIGH;
         uint8_t counter = 0;
@@ -141,37 +142,43 @@ int read_dht11_dat(int gpiopin)
         // print it out if data is good
         if ((j >= 40) &&
             (dht11_dat[4] == ((dht11_dat[0] + dht11_dat[1] + dht11_dat[2] + dht11_dat[3]) & 0xFF)) ) {
-
+		int celsius=dht11_dat[2];
+		if ( tempunit == 'F' ) {
+			/* Use Fahrenheit temperature units */			
 #if 0
-                {
+                    {
                         float f; // fahrenheit
 
                         f = ((dht11_dat[2] * 9.0) / 5.0) + 32;
                         printf("Humidity = %d.%d %% Temperature = %d.%d *C (%.1f *F)\n",
                                dht11_dat[0], dht11_dat[1], dht11_dat[2], dht11_dat[3], f);
-                }
+                    }
 #else
-                {
+                    {
                         int f;
-                        int celsius=dht11_dat[2];
                         /* Round up conditioned on decimal value */
                         if (dht11_dat[3] >= 5) {
                                 celsius++;
                         }
-                /*
-                 * F = (9/5) * Celsius + 32
-                 *  = ( (9 * Celsius) / 5 ) + 32
-                 *  = ( (9 * Celsius) / 5 ) + ( (32 * 5) / 5)
-                 *  = ( (9 * Celsius) / 5 ) + ( 160 / 5)
-                 */
+                        /*
+			 * F = (9/5) * Celsius + 32
+			 *  = ( (9 * Celsius) / 5 ) + 32
+			 *  = ( (9 * Celsius) / 5 ) + ( (32 * 5) / 5)
+			 *  = ( (9 * Celsius) / 5 ) + ( 160 / 5)
+			 */
                         f = ( (9 * celsius) + 160 ) / 5;
 #if 0
                         printf("%d.%d, %d",
                                dht11_dat[2], dht11_dat[3], f);
 #endif
                         printf("%d\n", f);
-                }
+                    }
 #endif
+		} else {
+			/* Use Celsius temperature units */
+			printf("%d.%d\n", dht11_dat[2], dht11_dat[3]);
+		}
+		
                 retcode=0;
         }
         return retcode;
@@ -225,7 +232,7 @@ int parse_opts(int argc, char **argv, struct _conf *conf)
           */
         conf->debug = 0;
         conf->gpio = DHTPIN;
-        conf->unit = "F";
+        conf->unit = 'F';
 
         while (1) {
                 int c;
@@ -241,7 +248,8 @@ int parse_opts(int argc, char **argv, struct _conf *conf)
                                 usage(argv[0]);
                                 exit(1);
                         case 'd':
-                                conf->debug=1;
+				conf->debug=1;
+				DEBUG=conf->debug;
                                 break;
                         case 'g':
                                 /*
@@ -255,7 +263,7 @@ int parse_opts(int argc, char **argv, struct _conf *conf)
                                 conf->gpio = atoi(optarg);
                                 break;
                         case 'u':
-                                conf->unit = optarg;
+                                conf->unit = toupper(*optarg);
                                 break;
                         case 'V':
                                 show_version();
@@ -288,17 +296,11 @@ int main (int argc, char **argv)
                 exit(1);
         }
 
-        DEBUG=conf.debug;
-        if (DEBUG) {
-                printf("gpio %d, temp unit %s\n", conf.gpio, conf.unit);
-        }
-
-
-        debug_print("Using GPIO %d\n", conf.gpio);
+        debug_print("Using GPIO %d, temperature units %c\n", conf.gpio, conf.unit);
 
         datacnt_total = datacnt_OK = datacnt_badnumbitsOK = datacnt_badnumbitslow = 0;
 
-        retcode=read_dht11_dat(conf.gpio);
+        retcode=read_dht11_dat(conf.gpio, conf.unit);
 
         return retcode;
 }

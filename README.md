@@ -2,8 +2,9 @@
 * Plot Raspberry Pi temperatures & CPU activity on a graph using:
   * [RRD](https://oss.oetiker.ch/rrdtool/) logging & graphing tool
   * [lighttpd](https://www.lighttpd.net/)
-* If you install a DHT11 temperature sensor then both Raspberry Pi CPU &
+* If you install a DHT11 temperature sensor, which is the default configuration, then both Raspberry Pi CPU &
 ambient temperatures are plotted.
+* If you do __NOT__ install a DHT11 temperature sensor then please read [Notes](#notes) below.
 
 ### Briefly
 * Get this repo
@@ -114,10 +115,25 @@ temperature values
 * Use this url ```http://localhost/cgi-bin/rpitemp.cgi```
 and wait for data to plotted
 
+### Notes:
+* If the command in crontab hangs it means that the temperature module DHT11 can not read a valid temperature
+  * Test by running the crontab entry _db_rpitempupdate.sh_ in a console
+  * Check GPIO used to read DHT11 in _rpiamb_gettemp.sh_. See [Ambient Temperature](#ambient-temperature) above
+  * If there is no DHT11 temperature sensor then you must comment out the following line in the _db_rpitempupdate.sh_ script.
+```
+    rrdtool update ${RRDDIR}/rpiamb.rrd N:${AMBTEMP1}
+```
+* To change temperature units from Fahrenheit to Celsius
+  * Edit file _db_rpitempupdate.sh_
+    * Change UNIT=F to UNIT=C
+  * Also change the graph axis description in _rpitemp.cgi_
+    * Change $temp_units = 'F'; to $temp_units = 'C';
+
 ### Manual Install instructions
 
 * The [install script tempgraph_install.sh](https://github.com/n7nix/rpi-temp-graph/blob/master/tempgraph_install.sh)
 does all of the following and this description is only included here for reference.
+
 
 ### Install RRDtool and Supporting Programs
 
