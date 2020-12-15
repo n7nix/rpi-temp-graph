@@ -19,8 +19,6 @@ CPULOAD=$(cat /proc/loadavg | cut -f2 -d ' ')
 ################ EDIT THE FOLLOWING LINES TO MATCH YOUR CONFIGURATION ####################
 ##########################################################################################
 
-UNIT=e 				# "m" for metric units or "e" for english units
-
 WWWUSER=www-data		# The web server user
 WWWGROUP=www-data		# The web server group
 
