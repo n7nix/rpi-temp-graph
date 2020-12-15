@@ -3,8 +3,6 @@
 scriptname="`basename $0`"
 user="pi"
 
-BINDIR="/home/$user/bin"
-
 REPO_NAME="rpi-temp-graph"
 CP="cp"
 CHOWN="sudo chown"
@@ -379,6 +377,8 @@ if [[ $EUID = 0 ]] ; then
    echo "Do NOT run as root."
    exit 1
 fi
+user=$(whoami)
+BINDIR="/home/$user/bin"
 
 # if there are any args then parse them
 while [[ $# -gt 0 ]] ; do
@@ -443,6 +443,10 @@ pwd
 
 echo
 echo "Update graph scripts, don't touch RRD database files"
+
+if [ ! -d "$BINDIR" ] ; then
+    mkdir -p $BINDIR
+fi
 
 update_graph_scripts
 setup_crontab
