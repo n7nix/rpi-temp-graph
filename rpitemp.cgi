@@ -22,6 +22,12 @@ my $db_dir = '/home/pi/var/lib/rpi/rrdtemp'; 	 # DB files directory
 my $tmp_dir = '/home/pi/var/tmp/rpitemp';	 # Images directory
 my $scriptname = 'rpitemp.cgi';	         # Script name
 
+## The degree symbol  Pango-WARNING **: Invalid UTF-8 string passed to pango_layout_set_text()
+## This doesn't work at all
+# $temp_units = '&deg;F';
+
+$temp_units = 'F';
+
 ############################################################
 ### YOU SHOULD NOT HAVE TO EDIT ANYTHING BELOW THIS LINE ###
 ############################################################
@@ -33,12 +39,6 @@ my $ypoints_err = 96;
 my $db_cpu = "$db_dir/rpicpu.rrd";
 my $db_ambient = "$db_dir/rpiamb.rrd";
 my $db_load = "$db_dir/rpicpuload.rrd";
-
-## The degree symbol  Pango-WARNING **: Invalid UTF-8 string passed to pango_layout_set_text()
-#$temp_units = '°F';
-## This doesn't work at all
-# $temp_units = '&deg;F';
-$temp_units = 'F';
 
 my @graphs = (
 	      { title => 'Daily Graphs',   seconds => 3600*24,        },

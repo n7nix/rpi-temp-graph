@@ -4,9 +4,6 @@
 # Get value of ambient temperature in degrees Fahrenheit
 # Calls dht11_temp C program to read DHT11 temperature sensor
 #
-# Any arguments on command line will set DEBUG flag
-DEBUG=
-
 # NEED TO EDIT WiringPi GPIO pin number to use
 #  Use:  `gpio readall` to translate between WiringPi & BCM gpio pin numbers
 #  Use:  `pinout` to get 40 pin header number
@@ -15,27 +12,76 @@ DEBUG=
 #      0        17        11              n/a
 #     21         5        29              3 (IO5)
 #     22         6        31              2 (IO6)
+#
+# A -d argument on command line will set DEBUG flag
+DEBUG=
 
 WIRINGPI_GPIO=0
-
 # Can run this script remotely using ssh
 # Need to create RSA keys so not prompted for password
 REMOTE=false
 IPADDR="10.0.42.37"
 
-user=$(whoami)
-# Check if there are any args on command line
-if (( $# != 0 )) ; then
-    DEBUG=1
-fi
+# Set default temperature units to Fahrenheit
+unit="F"
 
-# Set command to use
+# ===== Display program help info
+#
+usage () {
+    (
+    echo "Usage: $scriptname [-u <c|f>][-d][-h]"
+    echo "   -u <unit>    Specify temperature units, either c (Celsius) or f (Fahrenheit)"
+    echo "   -d           Set DEBUG flag"
+    echo "   -h           Display this message."
+    echo
+    ) 1>&2
+    exit 1
+}
+
+# ===== main
+
+user=$(whoami)
+
+# Check if there are any args on command line
+while [[ $# -gt 0 ]] ; do
+key="$1"
+
+case $key in
+   -u|--unit)
+      unit="$2"
+      # Conver to upper case
+      unit=$(echo "$unit" | tr '[a-z]' '[A-Z]')
+      if [ $unit != 'C' ] && [ $unit != 'F' ] ; then
+          echo "Invalid unit argument: $unit, default to Fahrenheit"
+	  unit = "F"
+      fi
+      shift # past argument
+   ;;
+   -d|--debug)
+      DEBUG=1
+      echo "Debug mode on"
+   ;;
+   -h|--help|?)
+      usage
+      exit 0
+   ;;
+   *)
+      # unknown option
+      echo "Unknow option: $key"
+      usage
+      exit 1
+   ;;
+esac
+shift # past argument or value
+done
+
+# Set either remote or local command to use
 if [ $REMOTE = true ] ; then
     # remote ambient temperature read
-    getdht11_temp="ssh pi@${IPADDR} $HOME/bin/dht11_temp -g $WIRINGPI_GPIO"
+    getdht11_temp="ssh pi@${IPADDR} $HOME/bin/dht11_temp -g $WIRINGPI_GPIO -u $unit"
 else
     # local ambient temperature read
-    getdht11_temp="/home/$user/bin/dht11_temp -g $WIRINGPI_GPIO"
+    getdht11_temp="/home/$user/bin/dht11_temp -g $WIRINGPI_GPIO -u $unit"
 fi
 
 # Read the temperature sensor
