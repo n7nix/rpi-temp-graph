@@ -7,6 +7,12 @@ ambient temperatures are plotted.
 * If you do __NOT__ install a DHT11 temperature sensor then please read [Notes](#notes) below.
 
 ### Briefly
+* If you have already done an install and just want to upgrade scripts without touching the data base files then run _tempgraph_install.sh_ with the update option:
+```
+cd rpi-temp-graph
+./tempgraph_install.sh -u
+```
+##### For a New Installation
 * Get this repo
 ```
 git clone https://github.com/n7nix/rpi-temp-graph
