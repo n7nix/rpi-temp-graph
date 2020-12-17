@@ -239,7 +239,7 @@ function update_graph_scripts() {
                 $CP $file_name $destdir
 
                 echo "DEBUG: Check directory: copy return: $?"
-                ls -al $destdir/$file_name
+                ls -al $destdir/$(basename $file_name)
             ;;
             *)
                 echo "Return code: $retcode, not recognized"
