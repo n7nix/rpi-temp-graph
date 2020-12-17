@@ -88,6 +88,7 @@ WIRINGPI_GPIO=
 
 ##### SongHe DHT11 using DRAWS hat AUX connectory and BCM GPIO 6
 
+* __NOTE:__ if using the DRAWS auxilliary connector you must use the [NWDR image](https://nw-digital-radio.groups.io/g/udrc/wiki/8921) so that the correct sensor drivers are installed.
 * Connects to 5V, GND and GPIO
   * DRAWS aux port pin reference: [DRAWS accessory
   connector](http://nwdigitalradio.com/wp-content/uploads/2020/08/DRAWSBrochure.pdf)
@@ -134,6 +135,49 @@ and wait for data to plotted
     * Change UNIT=F to UNIT=C
   * Also change the graph axis description in _rpitemp.cgi_
     * Change $temp_units = 'F'; to $temp_units = 'C';
+
+* After install and editing _rpiamb_gettemp.sh_ in the local bin directory ie. /home/pi/bin
+  * Read the ambient temperature sensor once
+```
+rpiamb_gettemp.sh
+```
+* If the graph is displaying nan then the WIRINGPI_GPIO variable in rpamb_gettemp.sh is the wrong value.
+
+### Debugging DHT11 ambient temperature sensor
+
+* To read ambient temperature once using gpio 21
+```
+# Go to the rpi-temp-graph/dht11 directory
+cd
+cd rpi_temp-graph/dht11
+./dht11 -g 21
+
+```
+* To read ambient temperature & humidity continuously using gpio 21
+```
+# Go to the rpi-temp-graph/dht11 directory
+cd
+cd rpi_temp-graph/dht11
+./humiture -g 21
+
+```
+* To read just the ambient temperature sensor continuously using gpio 21
+```
+# Go to the rpi-temp-graph directory
+cd
+cd rpi_temp-graph
+./amb_test.sh 21
+```
+### Debugging RPi CPU temperature sensor
+* Verify RPi CPU temperature
+```
+rpicpu_gettemp.sh
+```
+### Debugging RPi CPU load values
+* Verify RPi activity
+```
+cat /proc/loadavg | cut -f2 -d ' '
+```
 
 ### Manual Install instructions
 
