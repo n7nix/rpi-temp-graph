@@ -46,6 +46,7 @@ struct _conf {
 int dht11_dat[5] = {0,0,0,0,0};
 int datacnt_total, datacnt_OK, datacnt_badnumbitsOK, datacnt_badnumbitslow;
 
+
 #define PINLOW_PERIOD 18    /* Milliseconds */
 #define PINHIGH_PERIOD 40   /* Microseconds */
 
@@ -144,16 +145,14 @@ int read_dht11_dat(int gpiopin, char tempunit)
             (dht11_dat[4] == ((dht11_dat[0] + dht11_dat[1] + dht11_dat[2] + dht11_dat[3]) & 0xFF)) ) {
 		int celsius=dht11_dat[2];
 		if ( tempunit == 'F' ) {
-			/* Use Fahrenheit temperature units */			
-#if 0
-                    {
-                        float f; // fahrenheit
+		        /* Use Fahrenheit temperature units */			
+			if ( DEBUG == 1 ) {
+				float f; // fahrenheit
 
-                        f = ((dht11_dat[2] * 9.0) / 5.0) + 32;
-                        printf("Humidity = %d.%d %% Temperature = %d.%d *C (%.1f *F)\n",
-                               dht11_dat[0], dht11_dat[1], dht11_dat[2], dht11_dat[3], f);
-                    }
-#else
+				f = ((dht11_dat[2] * 9.0) / 5.0) + 32;
+				printf("Humidity = %d.%d %% Temperature = %d.%d *C (%.1f *F)\n",
+				       dht11_dat[0], dht11_dat[1], dht11_dat[2], dht11_dat[3], f);
+			}
                     {
                         int f;
                         /* Round up conditioned on decimal value */
@@ -173,7 +172,7 @@ int read_dht11_dat(int gpiopin, char tempunit)
 #endif
                         printf("%d\n", f);
                     }
-#endif
+
 		} else {
 			/* Use Celsius temperature units */
 			printf("%d.%d\n", dht11_dat[2], dht11_dat[3]);
@@ -210,7 +209,6 @@ void usage(char *argv0)
                "\n",
                argv0);
 }
-
 
 /*
  * Parse command line options
