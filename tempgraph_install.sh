@@ -66,7 +66,7 @@ function start_service() {
 
 function cfg_lighttpd() {
 
-    echo "start function: ${FUNCNAME[0]}"
+    dbgecho "start function: ${FUNCNAME[0]}"
     pkg_name="apache2"
     is_pkg_installed $pkg_name
     if [ $? -eq 0 ] ; then
@@ -80,7 +80,7 @@ function cfg_lighttpd() {
         sudo apt-get install -y -q $pkg_name
     fi
 
-    echo "DEBUG: setup lighttpd log file"
+    echo "${FUNCNAME[0]}: setup lighttpd log file"
     if [ ! -d "/var/log/lighttpd" ] ; then
         sudo mkdir -p "/var/log/lighttpd"
         sudo touch "/var/log/lighttpd/error.log"
@@ -88,7 +88,7 @@ function cfg_lighttpd() {
 
     $CHOWN -R www-data:www-data "/var/log/lighttpd"
 
-    echo "DEBUG: About to enable lighttpd modules: CHOWN=$CHOWN"
+    echo "${FUNCNAME[0]}: enable lighttpd modules"
     sudo lighttpd-enable-mod fastcgi
     sudo lighttpd-enable-mod fastcgi-php
 
@@ -116,7 +116,7 @@ EOT
     retcode=$?
     echo "DEBUG: grep deny access to: $retcode"
     if [ "$retcode" -ne 0 ] ; then
-        # If you're using lighttpd, add the following to your configuration file:
+        # If you're using lighttpd, add the following to lighttpd configuration file:
         sudo tee -a $lighttpdcfg_file > /dev/null << 'EOT'
 # deny access to /data directory
 $HTTP["url"] =~ "^/data/" {
@@ -146,11 +146,10 @@ index-file.names           += ( "index.pl",   "default.pl",
 EOT
     fi
 
+# ===== reference code begin
     if [ 1 -eq 0 ] ; then
 
     echo "DEBUG: modify 15-fastcgi-php.conf"
-    sudo lighttpd-enable-mod fastcgi-php
-
     # back this file up until verified
     lighttpd_conf_avail_dir="/etc/lighttpd/conf-available"
     sudo cp $lighttpd_conf_avail_dir/15-fastcgi-php.conf $lighttpd_conf_avail_dir/15-fastcgi-php.bak1.conf
@@ -178,8 +177,10 @@ EOT
     fi
 
     fi # end if 1 = 0
+# ===== reference code end
 
     # Check for any configuration syntax errors
+    echo "${FUNCNAME[0]}: Verify changes made to lighttpd config file"
     lighttpd -t -f /etc/lighttpd/lighttpd.conf
 
     # Restart lighttpd
