@@ -8,6 +8,9 @@ CP="cp"
 CHOWN="sudo chown"
 SYSTEMCTL="sudo systemctl"
 
+UDR_INSTALL_LOGFILE="/var/log/udr_install.log"
+CFG_FINISHED_MSG="$REPO_NAME install script FINISHED"
+
 # Refresh scripts only
 b_refresh_only=false
 
@@ -466,4 +469,4 @@ cfg_lighttpd
 create_all_rrd_files
 
 echo
-echo "temperature graph install FINISHED at $(date)"
+echo "$(date "+%Y %m %d %T %Z"): $scriptname: $CFG_FINISHED_MSG" | sudo tee -a $UDR_INSTALL_LOGFILE
