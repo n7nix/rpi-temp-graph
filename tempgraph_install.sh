@@ -64,6 +64,7 @@ function start_service() {
 # Modifys or creates files:
 #   /var/log/lighttpd/error.log
 #   /etc/lighttpd/lighttpd.conf
+#   /etc/lighttpd/cgi.conf
 #   /etc/lighttpd/conf-available/15-fastcgi-php
 #   /etc/php/$PHPVER/fpm/php.ini
 
@@ -98,7 +99,7 @@ function cfg_lighttpd() {
     ls -l /etc/lighttpd/conf-enabled
 
     # Change first occurrence of string containing document root directory
-    # server.document-root should be: /var/www
+    # server.document-root should be here: /var/www
     sudo sed -i -e '0,/server\.document-root / s/server\.document-root .*/server\.document-root = \"\/var\/www\/"/' /etc/lighttpd/lighttpd.conf
 
     # Add these two lines to lighttpd.conf
@@ -115,23 +116,9 @@ EOT
         echo "lighttpd.conf, already has cgi.conf entry."
     fi
 
-    grep -i "deny access to /data directory" $lighttpdcfg_file > /dev/null
-    retcode=$?
-    echo "DEBUG: grep deny access to: $retcode"
-    if [ "$retcode" -ne 0 ] ; then
-        # If you're using lighttpd, add the following to lighttpd configuration file:
-        sudo tee -a $lighttpdcfg_file > /dev/null << 'EOT'
-# deny access to /data directory
-$HTTP["url"] =~ "^/data/" {
-     url.access-deny = ("")
-}
-EOT
-    else
-        echo "lighttpd.conf, already has a deny access to /data directory entry."
-    fi
-
     if [ ! -f /etc/lighttpd/cgi.conf ] ; then
-    sudo tee -a /etc/lighttpd/cgi.conf > /dev/null  << EOT
+        echo "cgi.conf file not found, creating"
+        sudo tee -a /etc/lighttpd/cgi.conf > /dev/null  << EOT
 server.modules += ( "mod_cgi" )
 
 cgi.assign                 = ( ".pl"  => "/usr/bin/perl",
