@@ -299,13 +299,13 @@ function create_missing_rrd_files() {
         if [ -e "/home/$user/var/lib/rpi/rrdtemp/rpicpu.rrd" ] && [ -e "/home/$user/var/lib/rpi/rrdtemp/rpiamb.rrd" ] ; then
             echo "Found temperature database files"
         else
-            $BINDIR/db_rpitempbuilder.sh
+            $BINDIR/db_rpitempbuilder.sh force
         fi
 
         if [ -e "/home/$user/var/lib/rpi/rrdtemp/rpicpuload.rrd" ] ; then
             echo "Found CPU load database files"
         else
-            $BINDIR/db_rpicpuload_builder.sh
+            $BINDIR/db_rpicpuload_builder.sh force
         fi
     else
         echo "Did not find required directories ... exiting"

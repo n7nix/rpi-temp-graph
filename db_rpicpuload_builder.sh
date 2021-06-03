@@ -11,19 +11,36 @@ RRDDIR="$MNTPNT/var/lib/rpi/rrdtemp"	# This should be the same as RRDDIR in db_r
 ### YOU SHOULD NOT HAVE TO EDIT ANYTHING BELOW THIS LINE ##############################
 #######################################################################################
 
+# ===== prompt to build data base files
+function prompt_build_db() {
+
+    echo "Are you sure you want to create the database files ?"
+    echo -n "IT WILL OVERWRITE EXISTING DATA (y/n) "
+    read ANSWER
+    echo ""
+}
+
+# ===== main
+
 #clear
 
 echo ""
 echo "RRDrpi : CPU load database builder"
 echo "-----------------------------"
-echo "Are you sure you want to create the database files ?"
-echo -n "IT WILL OVERWRITE EXISTING DATA (y/n) "
-read ANSWER
-echo ""
+
+# Default to overwriting any existing database files
+ANSWER="y"
+
+# If any command line args do not prompt, just over write files.
+# - for unattended initial install
+if [ "$#" -eq 0 ] ; then
+    # sets variable ANSWER to y or n
+    prompt_build_db
+fi
+
 #        --step 60 \
 #	--start ${TIMESEC}-1000 \
 #	--start 1127253600 \
-
 
 if [ ${ANSWER} = "n" ] ; then
 
