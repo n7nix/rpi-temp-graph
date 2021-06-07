@@ -333,16 +333,16 @@ function create_all_rrd_files() {
         if [[ ! $REPLY =~ ^[Yy]$ ]] ; then
             echo "Graph files unchanged ..."
         else
-            $BINDIR/db_rpitempbuilder.sh
-            $BINDIR/db_rpicpuload_builder.sh
+            $BINDIR/db_rpitempbuilder.sh force
+            $BINDIR/db_rpicpuload_builder.sh force
             $CHOWN -R $user:$user /home/$user/var
             $CHOWN -R www-data:www-data /home/$user/var/tmp/rpitemp
         fi
     else
         mkdir -p "/home/$user/var/lib/rpi/rrdtemp"
         mkdir -p "/home/$user/var/tmp/rpitemp"
-        $BINDIR/db_rpitempbuilder.sh
-        $BINDIR/db_rpicpuload_builder.sh
+        $BINDIR/db_rpitempbuilder.sh force
+        $BINDIR/db_rpicpuload_builder.sh force
         $CHOWN -R $user:$user /home/$user/var
         $CHOWN -R www-data:www-data /home/$user/var/tmp/rpitemp
     fi
