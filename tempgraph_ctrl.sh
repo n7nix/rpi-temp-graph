@@ -1,22 +1,50 @@
 #!/bin/bash
 #
-# tempgraph_status.sh
+# tempgraph_ctrl.sh
 #
-# Start, Stop & show status for RPi temperature & CPU graph functions
+# Start, Stop & display status for RPi temperature & CPU activity graph functions
 
 DEBUG=
 
 scriptname="`basename $0`"
+user="pi"
 
 # function STOP tempgraph
 
+# Only comment out lines that include these scripts:
+#  db_rpitempupdate.sh
+#  db_rpicpuload_update.sh
+
 function tempgraph_stop () {
+
+    #  take the output of crontab -l, which is obviously your complete
+    #  crontab, manipulates it with sed, and then writes a new crontab
+    #  based on its output using crontab -.
+
+    crontab -l | sed '/db_rpitempupdate\.sh/s!^!#!' | crontab -
+    crontab -l | sed '/db_rpicpuload_update\.sh/s!^!#!' | crontab -
+
     return;
 }
 
 # function START tempgraph
 
 function tempgraph_start () {
+
+    crontab -u $user -l > /dev/null 2>&1
+    if [ $? -ne 0 ] ; then
+        echo "user: $user does NOT have a crontab, creating"
+       {
+           echo "# m h  dom mon dow   command"
+           echo "*/5  *   *   *   *  /bin/bash /home/$user/bin/db_rpitempupdate.sh"
+           echo "*    *   *   *   *  /bin/bash /home/$user/bin/db_rpicpuload_update.sh"
+       } | crontab -u $user -
+    else
+
+        # crontab -l | sed '/# *\([^ ][^ ]*  *\)\{5\}[^ ]*test\.sh/s/^# *//' | crontab -
+        crontab -l | sed '/db_rpitempupdate\.sh/s!^#!!' | crontab -
+        crontab -l | sed '/db_rpicpuload_update\.sh/s!^#!!' | crontab -
+    fi
     return;
 }
 
