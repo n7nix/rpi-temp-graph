@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Runs from a crontab to periodically send out a 'proof of life' email
+#
+
 scriptname="`basename $0`"
 DEBUG=
 
