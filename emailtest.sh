@@ -81,7 +81,7 @@ fi
 
     echo "Internal IP address: lan: $my_lanip, WiFi: $my_wlanip"
     echo "External IP address: $external_ip"
-    echo "Running on: $(uname -s)"
+    echo "Running on: $(uname -s), ver: $(cat /etc/*version), kernel ver: $(uname -r)"
 } > $MSGFILE
 
 # Debug mode only display generated MSG file
