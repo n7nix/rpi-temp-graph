@@ -82,6 +82,26 @@ fi
     echo "Internal IP address: lan: $my_lanip, WiFi: $my_wlanip"
     echo "External IP address: $external_ip"
     echo "Running on: $(uname -s), ver: $(cat /etc/*version), kernel ver: $(uname -r)"
+
+    # Watchdog timer
+    RSTS_REG=$(vcgencmd get_rsts)
+
+    REBOOT_CNT=$(last reboot | grep ^reboot | wc -l)
+    UP_TIME="$(uptime -p)"
+    echo
+    echo "=== RSTS: $RSTS_REG, reboot count: $REBOOT_CNT, $UP_TIME"
+    
+    rsts_val=$(echo $RSTS_REG | cut -d'=' -f 2)
+    if [ "$rsts_val" == "1000" ] ; then
+        echo "restart due to a power-on reset"
+    elif [ "$rsts_val" == "20" ] ; then
+        echo "restart due to a watchdog reset"
+    else
+        echo "Check these bits: -$rsts_val- for restart reason"
+    fi
+    echo
+    last reboot | head -n 5
+
 } > $MSGFILE
 
 # Debug mode only display generated MSG file
