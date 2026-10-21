@@ -14,6 +14,32 @@ function usage() {
    echo
 }
 
+# ===== function temp_sensor
+
+function temp_sensor() {
+
+    # Read external temperature sensor DHT11 or DHT22
+    if [ -e /etc/cpuinfo ] ; then
+        sudo mount --bind /etc/cpuinfo /proc/cpuinfo
+    fi
+
+    temp_humid="$(/home/pi/my-venv/bin/python /home/pi/my-venv/dev/simpletest.py)"
+
+    if [ -e /etc/cpuinfo ] ; then
+        sudo umount /proc/cpuinfo
+    fi
+
+    degrees_celsius="$(echo $temp_humid | cut -d'=' -f2 | cut -d'*' -f1)"
+    # debug
+    # echo "degrees_celsius:$degrees_celsius"
+
+    # $(echo "scale=2; $C * 9/5 + 32" | bc) to ensure precision.
+    degrees_fahrenheit=$(echo "scale=2; $degrees_celsius * 9/5 + 32" | bc)
+
+    # debug
+    # echo "degrees_fahrenheit: $degrees_fahrenheit"
+}
+
 # ==== Main
 
 # MSGFILE="emailtemp.txt"
@@ -53,6 +79,7 @@ done
 # Check if kernel version is less than 7.1
 # uname -r
 
+
 subject="Test email from $(uname -n)"
 target="basil@pacabunga.com"
 
@@ -74,6 +101,10 @@ fi
     f_temp=$(( ( 9 * f_temp +160 ) / 5 ));
     
     echo "$(date): CPU temp: $c_temp C, $f_temp F"
+    temp_sensor
+    echo -n "Temp=$degrees_fahrenheit*F  "
+    echo "$temp_humid"
+    echo
 
     my_wlanip=$(ip a show | grep -i "inet " | grep -i "wlan0" | sed 's/^[[:space:]]*//' | cut -d ' ' -f2 | cut -d '/' -f1)
     my_lanip=$(ip route get 1.1 | awk '{print $7; exit}')
@@ -81,7 +112,9 @@ fi
 
     echo "Internal IP address: lan: $my_lanip, WiFi: $my_wlanip"
     echo "External IP address: $external_ip"
+    echo
     echo "Running on: $(uname -s), ver: $(cat /etc/*version), kernel ver: $(uname -r)"
+    echo "$($HOME/bin/piver.sh)"
 
     # Watchdog timer
     RSTS_REG=$(vcgencmd get_rsts)
