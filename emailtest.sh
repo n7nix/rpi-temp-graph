@@ -18,26 +18,30 @@ function usage() {
 
 function temp_sensor() {
 
-    # Read external temperature sensor DHT11 or DHT22
+    exitcode=1
+    
+    # read external temperature sensor DHT11 or DHT22
     if [ -e /etc/cpuinfo ] ; then
+        # hack so Adafruit library can parse what hardware it's running
+        # on
         sudo mount --bind /etc/cpuinfo /proc/cpuinfo
-    fi
 
-    temp_humid="$(/home/pi/my-venv/bin/python /home/pi/my-venv/dev/simpletest.py)"
+        temp_humid="$(/home/pi/my-venv/bin/python /home/pi/my-venv/dev/simpletest.py)"
 
-    if [ -e /etc/cpuinfo ] ; then
         sudo umount /proc/cpuinfo
+
+        degrees_celsius="$(echo $temp_humid | cut -d'=' -f2 | cut -d'*' -f1)"
+        # debug
+        # echo "degrees_celsius:$degrees_celsius"
+        # $(echo "scale=2; $C * 9/5 + 32" | bc) to ensure precision.
+	
+        degrees_fahrenheit=$(echo "scale=2; $degrees_celsius * 9/5 + 32" | bc)
+
+        # debug
+        # echo "degrees_fahrenheit: $degrees_fahrenheit"
+	exitcode=0
     fi
-
-    degrees_celsius="$(echo $temp_humid | cut -d'=' -f2 | cut -d'*' -f1)"
-    # debug
-    # echo "degrees_celsius:$degrees_celsius"
-
-    # $(echo "scale=2; $C * 9/5 + 32" | bc) to ensure precision.
-    degrees_fahrenheit=$(echo "scale=2; $degrees_celsius * 9/5 + 32" | bc)
-
-    # debug
-    # echo "degrees_fahrenheit: $degrees_fahrenheit"
+    return $exitcode 
 }
 
 # ==== Main
@@ -102,8 +106,14 @@ fi
     
     echo "$(date): CPU temp: $c_temp C, $f_temp F"
     temp_sensor
-    echo -n "Temp=$degrees_fahrenheit*F  "
-    echo "$temp_humid"
+    retcode=$?
+    # echo "DEBUG: temp_sensor ret code: $retcode"
+    if [ $retcode -eq 0 ] ; then
+        echo -n "Temp=$degrees_fahrenheit*F  "
+        echo "$temp_humid"
+    else
+        echo "No temp sensor found"
+    fi
     echo
 
     my_wlanip=$(ip a show | grep -i "inet " | grep -i "wlan0" | sed 's/^[[:space:]]*//' | cut -d ' ' -f2 | cut -d '/' -f1)
