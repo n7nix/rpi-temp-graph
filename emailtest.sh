@@ -40,6 +40,8 @@ function temp_sensor() {
         # debug
         # echo "degrees_fahrenheit: $degrees_fahrenheit"
 	exitcode=0
+    else
+        echo "File /etc/cpuinfo does not exist"
     fi
     return $exitcode 
 }
