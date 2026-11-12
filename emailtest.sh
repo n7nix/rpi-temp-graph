@@ -29,7 +29,7 @@ function read_gpio() {
    # on
     sudo mount --bind /etc/cpuinfo /proc/cpuinfo
 
-    temp_humid="$($HOME/my-venv/bin/python $HOME/my-venv/dev/simpletest.py)"
+    temp_humid="$($HOME/my-venv/bin/python $HOME/my-venv/dev/gpio_gettemp.py)"
 	    
     sudo umount /proc/cpuinfo
 }
