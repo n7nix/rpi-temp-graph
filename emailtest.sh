@@ -14,6 +14,40 @@ function usage() {
    echo
 }
 
+# ===== function read_i2c
+
+function read_i2c() {
+    temp_humid="$($HOME/my-venv/bin/python $HOME/my-venv/dev/i2c_gettemp.py)"
+}
+
+
+# ===== function read_gpio
+
+function read_gpio() {
+
+   # hack so Adafruit library can parse what hardware it's running
+   # on
+    sudo mount --bind /etc/cpuinfo /proc/cpuinfo
+
+    temp_humid="$($HOME/my-venv/bin/python $HOME/my-venv/dev/simpletest.py)"
+	    
+    sudo umount /proc/cpuinfo
+}
+
+# ===== function factor_temp
+
+function factor_temp() {
+
+    degrees_celsius="$(echo $temp_humid | cut -d'=' -f2 | cut -d'*' -f1)"
+    # debug
+    # echo "degrees_celsius:$degrees_celsius"
+    # $(echo "scale=2; $C * 9/5 + 32" | bc) to ensure precision.
+	
+     degrees_fahrenheit=$(echo "scale=2; $degrees_celsius * 9/5 + 32" | bc)
+     # debug
+     # echo "degrees_fahrenheit: $degrees_fahrenheit"
+}
+
 # ===== function temp_sensor
 
 function temp_sensor() {
@@ -22,26 +56,29 @@ function temp_sensor() {
     
     # read external temperature sensor DHT11 or DHT22
     if [ -e /etc/cpuinfo ] ; then
-        # hack so Adafruit library can parse what hardware it's running
-        # on
-        sudo mount --bind /etc/cpuinfo /proc/cpuinfo
 
-        temp_humid="$(/home/pi/my-venv/bin/python /home/pi/my-venv/dev/simpletest.py)"
+        if [ -e $HOME/my-venv/dev ] ; then
 
-        sudo umount /proc/cpuinfo
-
-        degrees_celsius="$(echo $temp_humid | cut -d'=' -f2 | cut -d'*' -f1)"
-        # debug
-        # echo "degrees_celsius:$degrees_celsius"
-        # $(echo "scale=2; $C * 9/5 + 32" | bc) to ensure precision.
-	
-        degrees_fahrenheit=$(echo "scale=2; $degrees_celsius * 9/5 + 32" | bc)
-
-        # debug
-        # echo "degrees_fahrenheit: $degrees_fahrenheit"
-	exitcode=0
+	    read_gpio
+	    factor_temp
+	    exitcode=0
+	else
+	    echo "Virtual dev python directory not installed."
+	fi
     else
         echo "File /etc/cpuinfo does not exist"
+	# echo "Try reading i2c buss"
+	    is_i2c=$(raspi-config nonint get_i2c)
+	    if [ $is_i2c = 0 ] ; then
+	        echo "I2C enabled"
+		read_i2c
+		# debug
+		# echo "$temp_humid"
+		factor_temp
+		exitcode=0
+	    else
+	        echo "I2C NOT enabled"
+	    fi
     fi
     return $exitcode 
 }
